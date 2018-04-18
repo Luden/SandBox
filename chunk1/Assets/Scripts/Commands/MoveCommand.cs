@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
 namespace Assets.Scripts.Commands
 {
-	public class MoveCommand : CommandBase
+    public class MoveCommand : CommandBase
 	{
 		Vector3 _initialTarget;
 		Vector3 _navMeshTarget;

@@ -1,13 +1,9 @@
 ﻿using Assets.Scripts.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace Assets.Scripts.InputContext
 {
-	public class SelectionInputContext : InputContextBase
+    public class SelectionInputContext : InputContextBase
 	{
 		private SelectionManager _selectionManager;
 		private InputManager _inputManager;

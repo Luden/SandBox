@@ -1,7 +1,5 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using InputHelpers;
 using UnityEngine;
-using InputHelpers;
 
 public class CameraController : MonoBehaviour
 {

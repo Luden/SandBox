@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
+﻿using System.IO;
 using UnityEngine;
 
 public class GameSettings
@@ -25,7 +21,7 @@ public class GameSettings
 		{
 			return JsonUtility.FromJson<GameSettings>(File.ReadAllText(FileName));
 		}
-		catch (Exception e)
+		catch
 		{
 			return new GameSettings();
 		}

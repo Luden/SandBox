@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace Assets.Scripts.Commands
 {
-	public class CommandBase
+    public class CommandBase
 	{
 		public Action<CommandBase> OnCancel;
 		public Action<CommandBase> OnFinish;

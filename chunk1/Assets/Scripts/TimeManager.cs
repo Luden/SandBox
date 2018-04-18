@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace Assets.Scripts
 {
-	public class RegularUpdate
+    public class RegularUpdate
 	{
 		public Action Update;
 		public float Period;

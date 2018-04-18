@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Assets.Scripts.Commands
 {
-	public class CommandFactory
+    public class CommandFactory
 	{
 		private Dictionary<CommandType, List<CommandBase>> _commandPool = new Dictionary<CommandType, List<CommandBase>>();
 

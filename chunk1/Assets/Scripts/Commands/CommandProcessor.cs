@@ -50,6 +50,9 @@ namespace Assets.Scripts.Commands
 		{
 			TryStartCommand();
 
+            if (_currentCommand == null)
+                return;
+
 			if (_currentCommand.State != CommandState.Canceled)
 				_currentCommand.Update(_owner);
 

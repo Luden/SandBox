@@ -1,12 +1,9 @@
-﻿using Assets.Scripts;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using System;
 
 namespace Assets.Scripts.InputContext
 {
-	public class InputContextManager : MonoBehaviour
+    public class InputContextManager : MonoBehaviour
 	{
 		ManagerProvider _provider;
 
@@ -14,7 +11,8 @@ namespace Assets.Scripts.InputContext
 
 		void Start()
 		{
-			Init();
+            _provider = ManagerProvider.Instance;
+            Init();
 		}
 
 		private void Init()

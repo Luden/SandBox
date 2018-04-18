@@ -1,14 +1,11 @@
-﻿using Assets.Scripts.Commands;
+﻿using System.Collections.Generic;
+using Assets.Scripts.Commands;
 using Assets.Scripts.Input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace Assets.Scripts.InputContext
 {
-	public class MovementInputContext : InputContextBase
+    public class MovementInputContext : InputContextBase
 	{
 		private InputManager _inputManager;
 		private SelectionManager _selectionManager;

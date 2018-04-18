@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Assets.Scripts.Commands
 {
-	public class CommandManager : MonoBehaviour
+    public class CommandManager : MonoBehaviour
 	{
 		public CommandFactory CommandFactory { get; private set; }
 

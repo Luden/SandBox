@@ -1,14 +1,12 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using Assets.Scripts;
 using UnityEngine;
-using System;
 
 public class SelectionManager : MonoBehaviour
 {
-    [SerializeField]
-    UnitsManager _unitsManager;
-    Camera _mainCamera;
+    private UnitsManager _unitsManager;
+    private Camera _mainCamera;
 
 	public Action<List<ISelectable>, List<ISelectable>, List<ISelectable>> OnSelectionChange;
 
@@ -19,6 +17,7 @@ public class SelectionManager : MonoBehaviour
 	void Start()
 	{
         _mainCamera = Camera.main;
+        _unitsManager = ManagerProvider.Instance.UnitManager;
     }
 
 	public void ProcessSelection(Vector3 screenPos1, Vector3 screenPos2)
