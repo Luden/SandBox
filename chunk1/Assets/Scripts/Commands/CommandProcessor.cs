@@ -34,7 +34,23 @@ namespace Assets.Scripts.Commands
 			TryStartCommand();
 		}
 
-		private void TryStartCommand()
+        public void Clear()
+        {
+            if (_currentCommand != null)
+            {
+                _currentCommand.Cancel();
+                _commandFactory.Release(_currentCommand);
+                _currentCommand = null;
+            }
+            foreach (var command in _commands)
+            {
+                command.Cancel();
+                _commandFactory.Release(command);
+            }
+            _commands.Clear();
+        }
+
+        private void TryStartCommand()
 		{
 			if (_currentCommand != null)
 				return;

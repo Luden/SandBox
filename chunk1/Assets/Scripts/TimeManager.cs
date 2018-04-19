@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts.Core;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -12,13 +13,15 @@ namespace Assets.Scripts
 		public float LastUpdate;
 	}
 
-	public class TimeManager : MonoBehaviour
+	public class TimeManager : ManagerBase
 	{
 		private List<RegularUpdate> _tasks = new List<RegularUpdate>();
 		private List<RegularUpdate> _taskPool = new List<RegularUpdate>();
 		private List<RegularUpdate> _taskToRemove = new List<RegularUpdate>();
 
-		private RegularUpdate GetOrCreate()
+        public override ManagerType ManagerType { get { return ManagerType.Time; } }
+
+        private RegularUpdate GetOrCreate()
 		{
 			if (_taskPool.Count == 0)
 				return new RegularUpdate();

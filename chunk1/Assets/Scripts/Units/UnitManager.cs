@@ -1,11 +1,19 @@
 ﻿using System.Collections.Generic;
 using Assets.Scripts;
 using Assets.Scripts.Commands;
+using Assets.Scripts.Core;
 using UnityEngine;
 
-public class UnitsManager : MonoBehaviour
+public class UnitManager : ManagerBase
 {
     List<Unit> _units = new List<Unit>();
+
+    public override ManagerType ManagerType { get { return ManagerType.Unit; } }
+
+    public override void Init()
+    {
+        _units.AddRange(GameObject.FindObjectsOfType<Unit>());
+    }
 
     public IEnumerable<ISelectable> Selectables
     {
@@ -26,10 +34,5 @@ public class UnitsManager : MonoBehaviour
 					yield return unit.CommandProcessor;
 			}
 		}
-	}
-
-	void Start()
-	{
-        _units.AddRange(GameObject.FindObjectsOfType<Unit>());
 	}
 }

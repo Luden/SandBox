@@ -5,16 +5,16 @@ using UnityEngine.UI;
 public class SelectionRectView : MonoBehaviour
 {
 	[SerializeField]
-	private Image _rectBackground;
+	private Image _rectBackground = null;
 	[SerializeField]
-	private Image _rectBorder;
+	private Image _rectBorder = null;
 	[SerializeField]
-	private RectTransform _rectTransform;
+	private RectTransform _rectTransform = null;
 
 	[SerializeField]
-	private SelectionRect _selectionRect;
+	private SelectionRect _selectionRect = null;
 	[SerializeField]
-	private int _mouseButton;
+	private int _mouseButton = 0;
 
 	public void Start()
 	{

@@ -3,8 +3,6 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-	Camera _camera;
-
 	[SerializeField]
 	private float _borderMovementSpeed = 1f;
 	[SerializeField]
@@ -31,7 +29,7 @@ public class CameraController : MonoBehaviour
 	[SerializeField]
 	private bool _mouseScrollEnabled = true;
 	[SerializeField]
-	private float _scrollStep;
+	private float _scrollStep = 0.1f;
 
 
 	[Space, SerializeField]
@@ -47,9 +45,9 @@ public class CameraController : MonoBehaviour
 	[SerializeField]
 	private float MinY = 5;
 	[SerializeField]
-	private float MaxHeightPitch;
+	private float MaxHeightPitch = 60;
 	[SerializeField]
-	private float MinHeightPitch;
+	private float MinHeightPitch = 40;
 
 	void Start()
 	{

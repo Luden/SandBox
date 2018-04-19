@@ -1,26 +1,33 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.Core;
+using UnityEngine;
 
 namespace Assets.Scripts.Commands
 {
-    public class CommandManager : MonoBehaviour
+    public class CommandManager : ManagerBase
 	{
 		public CommandFactory CommandFactory { get; private set; }
 
-		private UnitsManager _unitsManager;
+		private UnitManager _unitsManager;
 
-		private void Start()
+        public override ManagerType ManagerType { get { return ManagerType.Command; } }
+
+        public override void Init()
 		{
 			_unitsManager = ManagerProvider.Instance.UnitManager;
 			CommandFactory = new CommandFactory();
 		}
 
-		public void Send(CommandType commandType, Vector3 target)
+		public void Send(CommandType commandType, Vector3 target, bool queue)
 		{
 			foreach (var processor in _unitsManager.CommandReceivers)
 			{
-				var command = CommandFactory.GetOrCreateCommand(commandType);
+                if (!queue)
+                    processor.Clear();
+
+                var command = CommandFactory.GetOrCreateCommand(commandType);
 				command.Init(target);
-				processor.Add(command);
+
+                processor.Add(command);
 			}
 		}
 	}

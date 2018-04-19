@@ -1,23 +1,21 @@
 ﻿using System.Collections.Generic;
+using Assets.Scripts.Core;
 using UnityEngine;
 
 namespace Assets.Scripts.InputContext
 {
-    public class InputContextManager : MonoBehaviour
+    public class InputContextManager : ManagerBase
 	{
 		ManagerProvider _provider;
 
 		SortedDictionary<InputContextType, InputContextBase> _contexts;
 
-		void Start()
+        public override ManagerType ManagerType { get { return ManagerType.InputContext; } }
+
+        public override void Init()
 		{
             _provider = ManagerProvider.Instance;
-            Init();
-		}
-
-		private void Init()
-		{
-			_contexts = new SortedDictionary<InputContextType, InputContextBase>();
+            _contexts = new SortedDictionary<InputContextType, InputContextBase>();
 			_contexts[InputContextType.Selection] = new SelectionInputContext(_provider);
 			_contexts[InputContextType.Movement] = new MovementInputContext(_provider);
 			SubscribeContextNeeds();

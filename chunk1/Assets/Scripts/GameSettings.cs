@@ -8,7 +8,7 @@ public class GameSettings
 	public static GameSettings Instance { get { return _instance; } }
 
 	public float CameraSpeed = 1f;
-	public float UnitCommandsUpdatePeriod = 0.2f;
+	public float UnitCommandsUpdatePeriod = 0.1f;
 
 	public void Save()
 	{

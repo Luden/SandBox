@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Commands;
+﻿using System.Collections.Generic;
+using Assets.Scripts.Commands;
 using Assets.Scripts.Core;
 using Assets.Scripts.Input;
 using Assets.Scripts.InputContext;
@@ -9,31 +10,41 @@ namespace Assets.Scripts
     public class ManagerProvider : SingletonMonoBehaviour<ManagerProvider>
 	{
 		public GameSettings GameSettings;
-		public UnitsManager UnitManager;
+		public UnitManager UnitManager;
 		public InputManager InputManager;
 		public SelectionManager SelectionManager;
 		public CommandManager CommandManager;
 		public TimeManager TimeManager;
         public InputContextManager InputContextManager;
 
+        private Dictionary<ManagerType, ManagerBase> _managers = new Dictionary<ManagerType, ManagerBase>();
+
         protected override void Awake()
         {
             base.Awake();
 
-            if (GameSettings == null)
-                GameSettings = GameSettings.Instance;
-            if (UnitManager == null)
-                UnitManager = GameObject.FindObjectOfType<UnitsManager>();
-            if (InputManager == null)
-                InputManager = GameObject.FindObjectOfType<InputManager>();
-            if (SelectionManager == null)
-                SelectionManager = GameObject.FindObjectOfType<SelectionManager>();
-            if (CommandManager == null)
-                CommandManager = GameObject.FindObjectOfType<CommandManager>();
-            if (TimeManager == null)
-                TimeManager = GameObject.FindObjectOfType<TimeManager>();
-            if (InputContextManager == null)
-                InputContextManager = GameObject.FindObjectOfType<InputContextManager>();
+            GameSettings = GameSettings.Instance;
+
+            UnitManager = GameObject.FindObjectOfType<UnitManager>();
+            InputManager = GameObject.FindObjectOfType<InputManager>();
+            SelectionManager = GameObject.FindObjectOfType<SelectionManager>();
+            CommandManager = GameObject.FindObjectOfType<CommandManager>();
+            TimeManager = GameObject.FindObjectOfType<TimeManager>();
+            InputContextManager = GameObject.FindObjectOfType<InputContextManager>();
+
+            _managers[UnitManager.ManagerType] = UnitManager;
+            _managers[InputManager.ManagerType] = InputManager;
+            _managers[SelectionManager.ManagerType] = SelectionManager;
+            _managers[CommandManager.ManagerType] = CommandManager;
+            _managers[TimeManager.ManagerType] = TimeManager;
+            _managers[InputContextManager.ManagerType] = InputContextManager;
+
+            TimeManager.Init();
+            UnitManager.Init();
+            InputManager.Init();
+            SelectionManager.Init();
+            CommandManager.Init();
+            InputContextManager.Init();
         }
 	}
 }

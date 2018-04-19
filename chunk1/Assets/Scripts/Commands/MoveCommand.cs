@@ -19,7 +19,7 @@ namespace Assets.Scripts.Commands
 		public override void Start(Unit unit)
 		{
 			NavMeshHit hit;
-			if (!NavMesh.SamplePosition(_initialTarget, out hit, 10f, 0))
+			if (!NavMesh.SamplePosition(_initialTarget, out hit, 100f, NavMesh.AllAreas))
 			{
 				Cancel();
 				return;

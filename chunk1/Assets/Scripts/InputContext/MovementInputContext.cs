@@ -43,7 +43,7 @@ namespace Assets.Scripts.InputContext
 		{
 			var target = _selectionManager.TraceTerrain(start);
 			if (target != Vector3.zero)
-				_commandManager.Send(CommandType.Move, target);
+				_commandManager.Send(CommandType.Move, target, _inputManager.KeyInput.IsShift());
 		}
 	}
 }

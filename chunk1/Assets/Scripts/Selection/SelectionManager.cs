@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using Assets.Scripts;
+using Assets.Scripts.Core;
 using UnityEngine;
 
-public class SelectionManager : MonoBehaviour
+public class SelectionManager : ManagerBase
 {
-    private UnitsManager _unitsManager;
+    private UnitManager _unitsManager;
     private Camera _mainCamera;
 
 	public Action<List<ISelectable>, List<ISelectable>, List<ISelectable>> OnSelectionChange;
@@ -14,7 +15,9 @@ public class SelectionManager : MonoBehaviour
 	private List<ISelectable> _recentlySelectedUnits = new List<ISelectable>();
 	private List<ISelectable> _recentlyDeselectedUnits = new List<ISelectable>();
 
-	void Start()
+    public override ManagerType ManagerType { get { return ManagerType.Selection; } }
+
+    public override void Init()
 	{
         _mainCamera = Camera.main;
         _unitsManager = ManagerProvider.Instance.UnitManager;
@@ -67,7 +70,7 @@ public class SelectionManager : MonoBehaviour
 	{
 		RaycastHit hit;
 		var ray = _mainCamera.ScreenPointToRay(screenPos);
-		if (Physics.Raycast(ray, out hit, 1000, ~LayerMask.NameToLayer("Ground")))
+		if (Physics.Raycast(ray, out hit, 1000, ~LayerMask.NameToLayer("Terrain")))
 			return hit.point;
 
 		return Vector3.zero;
