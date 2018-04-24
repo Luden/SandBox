@@ -8,7 +8,15 @@ namespace Assets.Scripts.Commands
 		Vector3 _initialTarget;
 		Vector3 _navMeshTarget;
 
-		public override CommandType GetCommandType() { return CommandType.Move; }
+        const int StopPriority = 51;
+        const int MovePriority = 50;
+        const float StopCheckSpeedPart = 0.1f;
+        const float StopTime = 1f;
+
+        float _stopCheckSpeedSquared = 0f;
+        float _stopingTime = 0f;
+
+        public override CommandType GetCommandType() { return CommandType.Move; }
 
 		public override void Init(Vector3 target)
 		{
@@ -27,23 +35,45 @@ namespace Assets.Scripts.Commands
 
 			_navMeshTarget = hit.position;
 			unit.NavMeshAgent.SetDestination(_navMeshTarget);
+            unit.NavMeshAgent.avoidancePriority = MovePriority;
+            _stopCheckSpeedSquared = unit.NavMeshAgent.speed * unit.NavMeshAgent.speed * StopCheckSpeedPart;
+            _stopingTime = 0f;
 
-			base.Start(unit);
+            base.Start(unit);
 		}
 
-		public override void Update(Unit unit)
+        protected override void Stop()
+        {
+            Unit.NavMeshAgent.ResetPath();
+            Unit.NavMeshAgent.avoidancePriority = StopPriority;
+            base.Stop();
+        }
+
+        public override void Update(float dt)
 		{
-			if (!unit.NavMeshAgent.pathPending)
+            base.Update(dt);
+
+            if (Unit.NavMeshAgent.pathPending)
+                return;
+
+			if (Unit.NavMeshAgent.remainingDistance <= Unit.NavMeshAgent.stoppingDistance)
 			{
-				if (unit.NavMeshAgent.remainingDistance <= unit.NavMeshAgent.stoppingDistance)
+				if (!Unit.NavMeshAgent.hasPath || Unit.NavMeshAgent.velocity.sqrMagnitude == 0f)
 				{
-					if (!unit.NavMeshAgent.hasPath || unit.NavMeshAgent.velocity.sqrMagnitude == 0f)
-					{
-						Finish();
-					}
+					Finish();
 				}
 			}
-			base.Update(unit);
+
+            if (Unit.NavMeshAgent.velocity.sqrMagnitude < _stopCheckSpeedSquared)
+            {
+                _stopingTime += dt;
+                if (_stopingTime > StopTime)
+                    Finish();
+            }
+            else
+            {
+                _stopingTime = 0f;
+            }
 		}
 	}
 }

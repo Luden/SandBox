@@ -4,7 +4,7 @@ using UnityEngine;
 public class SelectionView : MonoBehaviour
 {
     [SerializeField]
-    Selectable _selectable;
+    Selectable _selectable = null;
     MeshRenderer _visual;
 
     void Start()

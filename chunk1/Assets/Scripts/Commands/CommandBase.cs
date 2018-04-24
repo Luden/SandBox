@@ -4,9 +4,12 @@ using UnityEngine;
 namespace Assets.Scripts.Commands
 {
     public class CommandBase
-	{
-		public Action<CommandBase> OnCancel;
-		public Action<CommandBase> OnFinish;
+    {
+        public Action<CommandBase> OnCancel;
+        public Action<CommandBase> OnFinish;
+        public Action<CommandBase> OnStop;
+
+        public Unit Unit { get; private set; }
 
 		public CommandState State { get; private set; }
 
@@ -17,11 +20,6 @@ namespace Assets.Scripts.Commands
 			State = CommandState.Inited;
 		}
 
-		public virtual void Start()
-		{
-			State = CommandState.Started;
-		}
-
 		public virtual void Init(Vector3 target)
 		{
 			Init();
@@ -29,23 +27,26 @@ namespace Assets.Scripts.Commands
 
 		public virtual void Start(Unit unit)
 		{
-			Start();
+            State = CommandState.Started;
+            Unit = unit;
 		}
 
-		public virtual void Update(Unit unit)
+		public virtual void Update(float dt)
 		{
 		}
 
 		public virtual void Finish()
 		{
-			State = CommandState.Finished;
+            Stop();
+            State = CommandState.Finished;
 			if (OnFinish != null)
 				OnFinish(this);
 		}
 
 		public virtual void Cancel()
 		{
-			State = CommandState.Canceled;
+            Stop();
+            State = CommandState.Canceled;
 			if (OnCancel != null)
 				OnCancel(this);
 		}
@@ -54,5 +55,11 @@ namespace Assets.Scripts.Commands
 		{
 			State = CommandState.Pooled;
 		}
+
+        protected virtual void Stop()
+        {
+            if (OnStop != null)
+                OnStop(this);
+        }
 	}
 }

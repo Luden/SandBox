@@ -13,8 +13,6 @@ public class SelectionRectView : MonoBehaviour
 
 	[SerializeField]
 	private SelectionRect _selectionRect = null;
-	[SerializeField]
-	private int _mouseButton = 0;
 
 	public void Start()
 	{

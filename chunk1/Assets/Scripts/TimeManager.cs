@@ -8,7 +8,7 @@ namespace Assets.Scripts
 {
     public class RegularUpdate
 	{
-		public Action Update;
+		public Action<float> Update;
 		public float Period;
 		public float LastUpdate;
 	}
@@ -31,7 +31,7 @@ namespace Assets.Scripts
 			return result;
 		}
 
-		public RegularUpdate StartUpdate(Action update, float period)
+		public RegularUpdate StartUpdate(Action<float> update, float period)
 		{
 			var task = GetOrCreate();
 			task.Update = update;
@@ -64,7 +64,7 @@ namespace Assets.Scripts
 			{
 				if (task.LastUpdate + task.Period < time)
 				{
-					task.Update();
+					task.Update(time - task.LastUpdate);
 					task.LastUpdate = time;
 				}
 			}

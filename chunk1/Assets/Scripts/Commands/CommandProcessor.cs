@@ -62,7 +62,7 @@ namespace Assets.Scripts.Commands
 			_currentCommand.Start(_owner);
 		}
 
-		public void Update()
+		public void Update(float dt)
 		{
 			TryStartCommand();
 
@@ -70,7 +70,7 @@ namespace Assets.Scripts.Commands
                 return;
 
 			if (_currentCommand.State != CommandState.Canceled)
-				_currentCommand.Update(_owner);
+				_currentCommand.Update(dt);
 
 			if (_currentCommand.State == CommandState.Canceled || _currentCommand.State == CommandState.Finished)
 			{
