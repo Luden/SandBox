@@ -29,8 +29,10 @@ public class SelectionManager : ManagerBase
 		_recentlySelectedUnits.Clear();
 		_recentlyDeselectedUnits.Clear();
 
-		foreach (var selectable in _unitsManager.Selectables)
+		foreach (var unit in _unitsManager.Units)
         {
+            var selectable = unit.Selectable;
+
             var unitScreenPos = _mainCamera.WorldToScreenPoint(selectable.Position);
             var inRect = unitScreenPos.x > screenPos1.x && unitScreenPos.x < screenPos2.x
                 && unitScreenPos.y > screenPos1.y && unitScreenPos.y < screenPos2.y;

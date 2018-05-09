@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Assets.Scripts.Formations;
+using UnityEngine;
 using UnityEngine.AI;
 
 namespace Assets.Scripts.Commands
@@ -16,12 +17,12 @@ namespace Assets.Scripts.Commands
         float _stopCheckSpeedSquared = 0f;
         float _stopingTime = 0f;
 
-        public override CommandType GetCommandType() { return CommandType.Move; }
+        public override CommandType GetKey() { return CommandType.Move; }
 
-		public override void Init(Vector3 target)
+		public override void Init(Vector3 target, Formation formation)
 		{
 			_navMeshTarget = _initialTarget = target;
-			base.Init(target);
+			base.Init(target, formation);
 		}
 
 		public override void Start(Unit unit)

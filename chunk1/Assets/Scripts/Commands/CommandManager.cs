@@ -1,4 +1,7 @@
-﻿using Assets.Scripts.Core;
+﻿using System.Linq;
+using System.Collections.Generic;
+using Assets.Scripts.Core;
+using Assets.Scripts.Formations;
 using UnityEngine;
 
 namespace Assets.Scripts.Commands
@@ -6,8 +9,11 @@ namespace Assets.Scripts.Commands
     public class CommandManager : ManagerBase
 	{
 		public CommandFactory CommandFactory { get; private set; }
+        public FormationFactory FormationFactory { get; private set; }
 
-		private UnitManager _unitsManager;
+        private UnitManager _unitsManager;
+
+        private List<Unit> _units = new List<Unit>();
 
         public override ManagerType ManagerType { get { return ManagerType.Command; } }
 
@@ -15,19 +21,26 @@ namespace Assets.Scripts.Commands
 		{
 			_unitsManager = ManagerProvider.Instance.UnitManager;
 			CommandFactory = new CommandFactory();
-		}
+            FormationFactory = new FormationFactory();
+        }
 
 		public void Send(CommandType commandType, Vector3 target, bool queue)
 		{
-			foreach (var processor in _unitsManager.CommandReceivers)
+            _units.Clear();
+            _units.AddRange(_unitsManager.Units.Where(unit => unit.Selectable.Selected));
+
+            var formation = FormationFactory.GetOrCreate(FormationFactory.GetFormationType(commandType));
+            formation.Init(_units);
+
+            foreach (var unit in _units)
 			{
                 if (!queue)
-                    processor.Clear();
+                    unit.CommandProcessor.Clear();
 
-                var command = CommandFactory.GetOrCreateCommand(commandType);
-				command.Init(target);
+                var command = CommandFactory.GetOrCreate(commandType);
+                command.Init(target, formation);
 
-                processor.Add(command);
+                unit.CommandProcessor.Add(command);
 			}
 		}
 	}

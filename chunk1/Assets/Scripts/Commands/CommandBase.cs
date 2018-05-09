@@ -1,28 +1,32 @@
 ﻿using System;
+using Assets.Scripts.Core;
+using Assets.Scripts.Formations;
 using UnityEngine;
 
 namespace Assets.Scripts.Commands
 {
-    public class CommandBase
+    public class CommandBase : IKeyProvider<CommandType>
     {
         public Action<CommandBase> OnCancel;
         public Action<CommandBase> OnFinish;
         public Action<CommandBase> OnStop;
 
         public Unit Unit { get; private set; }
+        public Formation Formation { get; private set; }
 
-		public CommandState State { get; private set; }
+        public CommandState State { get; private set; }
 
-		public virtual CommandType GetCommandType() { return CommandType.None; }
+		public virtual CommandType GetKey() { return CommandType.None; }
 
 		public virtual void Init()
 		{
 			State = CommandState.Inited;
 		}
 
-		public virtual void Init(Vector3 target)
+		public virtual void Init(Vector3 target, Formation formation)
 		{
-			Init();
+            Formation = formation;
+            Init();
 		}
 
 		public virtual void Start(Unit unit)
