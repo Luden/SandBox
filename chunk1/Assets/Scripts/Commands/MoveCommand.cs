@@ -9,7 +9,7 @@ namespace Assets.Scripts.Commands
 		Vector3 _initialTarget;
 		Vector3 _navMeshTarget;
 
-        const int StopPriority = 51;
+        const int StopPriority = 50;
         const int MovePriority = 50;
         const float StopCheckSpeedPart = 0.1f;
         const float StopTime = 1f;
@@ -35,24 +35,36 @@ namespace Assets.Scripts.Commands
 			}
 
 			_navMeshTarget = hit.position;
-			unit.NavMeshAgent.SetDestination(_navMeshTarget);
-            unit.NavMeshAgent.avoidancePriority = MovePriority;
-            _stopCheckSpeedSquared = unit.NavMeshAgent.speed * unit.NavMeshAgent.speed * StopCheckSpeedPart;
-            _stopingTime = 0f;
+            unit.NavMeshObstacle.enabled = false;
+            _lateStarted = false;
 
             base.Start(unit);
 		}
+
+        bool _lateStarted = false;
 
         protected override void Stop()
         {
             Unit.NavMeshAgent.ResetPath();
             Unit.NavMeshAgent.avoidancePriority = StopPriority;
+            Unit.NavMeshAgent.enabled = false;
+            Unit.NavMeshObstacle.enabled = true;
             base.Stop();
         }
 
         public override void Update(float dt)
 		{
             base.Update(dt);
+
+            if (!_lateStarted)
+            {
+                Unit.NavMeshAgent.enabled = true;
+                Unit.NavMeshAgent.SetDestination(_navMeshTarget);
+                Unit.NavMeshAgent.avoidancePriority = MovePriority;
+                _stopCheckSpeedSquared = Unit.NavMeshAgent.speed * Unit.NavMeshAgent.speed * StopCheckSpeedPart;
+                _stopingTime = 0f;
+                _lateStarted = true;
+            }
 
             if (Unit.NavMeshAgent.pathPending)
                 return;

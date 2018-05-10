@@ -24,11 +24,13 @@ namespace Assets.Scripts.InputContext
 		public override void Enable()
 		{
 			_inputManager.SelectionRect.OnRectStartRight += OnRightClick;
+            base.Enable();
 		}
 
 		public override void Disable()
 		{
 			_inputManager.SelectionRect.OnRectStartRight -= OnRightClick;
+            base.Disable();
 		}
 
 		private void OnSelectionChange(List<ISelectable> selected, List<ISelectable> added, List<ISelectable> removed)
