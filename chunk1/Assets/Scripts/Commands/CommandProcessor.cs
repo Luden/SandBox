@@ -5,34 +5,34 @@ using System.Text;
 
 namespace Assets.Scripts.Commands
 {
-	public class CommandProcessor
-	{
-		private Queue<CommandBase> _commands = new Queue<CommandBase>();
-		private CommandBase _currentCommand;
+    public class CommandProcessor
+    {
+        private Queue<CommandBase> _commands = new Queue<CommandBase>();
+        private CommandBase _currentCommand;
 
-		private Unit _owner; // dont know how to remove cyclic dependance
-		private CommandFactory _commandFactory;
-		private RegularUpdate _update;
-		private TimeManager _timeManager;
+        private Unit _owner; // dont know how to remove cyclic dependance
+        private CommandFactory _commandFactory;
+        private RegularUpdate _update;
+        private TimeManager _timeManager;
 
-		public CommandProcessor(CommandFactory commandFactory, TimeManager timeManager, float updatePeriod, Unit owner)
-		{
-			_owner = owner;
-			_commandFactory = commandFactory;
-			_timeManager = timeManager;
-			_update = _timeManager.StartUpdate(Update, updatePeriod);
-		}
+        public CommandProcessor(CommandFactory commandFactory, TimeManager timeManager, float updatePeriod, Unit owner)
+        {
+            _owner = owner;
+            _commandFactory = commandFactory;
+            _timeManager = timeManager;
+        }
 
-		public void Stop()
-		{
-			_timeManager.StopUpdate(_update);
-		}
+        public void Stop()
+        {
+            _timeManager.StopUpdate(_update);
+        }
 
-		public void Add(CommandBase command)
-		{
-			_commands.Enqueue(command);
-			TryStartCommand();
-		}
+        public void Add(CommandBase command)
+        {
+            _commands.Enqueue(command);
+            TryStartCommand();
+            Wake();
+        }
 
         public void Clear()
         {
@@ -51,23 +51,43 @@ namespace Assets.Scripts.Commands
         }
 
         private void TryStartCommand()
-		{
-			if (_currentCommand != null)
-				return;
+        {
+            if (_currentCommand != null)
+                return;
 
-			if (_commands.Count == 0)
-				return;
+            if (_commands.Count == 0)
+                return;
 
-			_currentCommand = _commands.Dequeue();
-			_currentCommand.Start(_owner);
-		}
+            _currentCommand = _commands.Dequeue();
+            _currentCommand.Start(_owner);
+        }
 
-		public void Update(float dt)
-		{
-			TryStartCommand();
+        private void Sleep()
+        {
+            if (_update == null)
+                return;
+
+            _timeManager.StopUpdate(_update);
+            _update = null;
+        }
+
+        private void Wake()
+        {
+            if (_update != null)
+                return;
+
+            _update = _timeManager.StartUpdate(Update, 0.1f);
+        }
+
+        public void Update(float dt)
+        {
+            TryStartCommand();
 
             if (_currentCommand == null)
+            {
+                Sleep();
                 return;
+            }
 
 			if (_currentCommand.State != CommandState.Canceled)
 				_currentCommand.Update(dt);

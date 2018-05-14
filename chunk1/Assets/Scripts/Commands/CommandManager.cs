@@ -20,7 +20,7 @@ namespace Assets.Scripts.Commands
         public override void Init()
 		{
 			_unitsManager = ManagerProvider.Instance.UnitManager;
-			CommandFactory = new CommandFactory();
+			CommandFactory = new CommandFactory(ManagerProvider.Instance.TimeManager);
             FormationFactory = new FormationFactory();
         }
 
@@ -30,7 +30,7 @@ namespace Assets.Scripts.Commands
             _units.AddRange(_unitsManager.Units.Where(unit => unit.Selectable.Selected));
 
             var formation = FormationFactory.GetOrCreate(FormationFactory.GetFormationType(commandType));
-            formation.Init(_units);
+            formation.Init(_units.Select(x => x.transform.position), target);
 
             foreach (var unit in _units)
 			{

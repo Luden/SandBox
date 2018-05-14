@@ -8,11 +8,18 @@ namespace Assets.Scripts.Commands
     {
 		private Dictionary<CommandType, List<CommandBase>> _commandPool = new Dictionary<CommandType, List<CommandBase>>();
 
+        private TimeManager _timeManager;
+
+        public CommandFactory(TimeManager timeManager) : base()
+        {
+            _timeManager = timeManager;
+        }
+
         protected override CommandBase Create(CommandType commandType)
 		{
 			switch (commandType)
 			{
-				case CommandType.Move: return new MoveCommand();
+				case CommandType.Move: return new MoveCommand(_timeManager);
 				default: return null;
 			}
 		}

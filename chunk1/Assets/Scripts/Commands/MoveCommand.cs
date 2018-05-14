@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Formations;
+﻿using System.Collections;
+using Assets.Scripts.Formations;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -9,8 +10,7 @@ namespace Assets.Scripts.Commands
 		Vector3 _initialTarget;
 		Vector3 _navMeshTarget;
 
-        const int StopPriority = 50;
-        const int MovePriority = 50;
+        const int StopPriority = 1;
         const float StopCheckSpeedPart = 0.1f;
         const float StopTime = 1f;
 
@@ -19,7 +19,14 @@ namespace Assets.Scripts.Commands
 
         public override CommandType GetKey() { return CommandType.Move; }
 
-		public override void Init(Vector3 target, Formation formation)
+        TimeManager _timeManager;
+
+        public MoveCommand(TimeManager timeManager) : base()
+        {
+            _timeManager = timeManager;
+        }
+
+        public override void Init(Vector3 target, Formation formation)
 		{
 			_navMeshTarget = _initialTarget = target;
 			base.Init(target, formation);
@@ -27,7 +34,9 @@ namespace Assets.Scripts.Commands
 
 		public override void Start(Unit unit)
 		{
-			NavMeshHit hit;
+            base.Start(unit);
+
+            NavMeshHit hit;
 			if (!NavMesh.SamplePosition(_initialTarget, out hit, 100f, NavMesh.AllAreas))
 			{
 				Cancel();
@@ -36,12 +45,18 @@ namespace Assets.Scripts.Commands
 
 			_navMeshTarget = hit.position;
             unit.NavMeshObstacle.enabled = false;
-            _lateStarted = false;
 
-            base.Start(unit);
-		}
+            _timeManager.LateUpdateOnce(LateUpdate);
+        }
 
-        bool _lateStarted = false;
+        private void LateUpdate(float t)
+        {
+            Unit.NavMeshAgent.enabled = true;
+            Unit.NavMeshAgent.SetDestination(_navMeshTarget);
+            Unit.NavMeshAgent.avoidancePriority = Random.Range(10, 90);
+            _stopCheckSpeedSquared = Unit.NavMeshAgent.speed * Unit.NavMeshAgent.speed * StopCheckSpeedPart;
+            _stopingTime = 0f;
+        }
 
         protected override void Stop()
         {
@@ -56,15 +71,8 @@ namespace Assets.Scripts.Commands
 		{
             base.Update(dt);
 
-            if (!_lateStarted)
-            {
-                Unit.NavMeshAgent.enabled = true;
-                Unit.NavMeshAgent.SetDestination(_navMeshTarget);
-                Unit.NavMeshAgent.avoidancePriority = MovePriority;
-                _stopCheckSpeedSquared = Unit.NavMeshAgent.speed * Unit.NavMeshAgent.speed * StopCheckSpeedPart;
-                _stopingTime = 0f;
-                _lateStarted = true;
-            }
+            if (!Unit.NavMeshAgent.enabled)
+                return;
 
             if (Unit.NavMeshAgent.pathPending)
                 return;
