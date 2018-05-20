@@ -12,7 +12,6 @@ namespace Assets.Scripts.Commands
         public Action<CommandBase> OnStop;
 
         public Unit Unit { get; private set; }
-        public Formation Formation { get; private set; }
 
         public CommandState State { get; private set; }
 
@@ -23,9 +22,8 @@ namespace Assets.Scripts.Commands
 			State = CommandState.Inited;
 		}
 
-		public virtual void Init(Vector3 target, Formation formation)
+		public virtual void Init(Vector3 target)
 		{
-            Formation = formation;
             Init();
 		}
 

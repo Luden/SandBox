@@ -26,10 +26,10 @@ namespace Assets.Scripts.Commands
             _timeManager = timeManager;
         }
 
-        public override void Init(Vector3 target, Formation formation)
+        public override void Init(Vector3 target)
 		{
 			_navMeshTarget = _initialTarget = target;
-			base.Init(target, formation);
+			base.Init(target);
 		}
 
 		public override void Start(Unit unit)
@@ -53,7 +53,7 @@ namespace Assets.Scripts.Commands
         {
             Unit.NavMeshAgent.enabled = true;
             Unit.NavMeshAgent.SetDestination(_navMeshTarget);
-            Unit.NavMeshAgent.avoidancePriority = Random.Range(10, 90);
+            Unit.NavMeshAgent.avoidancePriority = 50; // Random.Range(10, 90);
             _stopCheckSpeedSquared = Unit.NavMeshAgent.speed * Unit.NavMeshAgent.speed * StopCheckSpeedPart;
             _stopingTime = 0f;
         }

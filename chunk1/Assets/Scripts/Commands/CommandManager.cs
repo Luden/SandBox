@@ -32,16 +32,40 @@ namespace Assets.Scripts.Commands
             var formation = FormationFactory.GetOrCreate(FormationFactory.GetFormationType(commandType));
             formation.Init(_units.Select(x => x.transform.position), target);
 
+            int index = 0;
             foreach (var unit in _units)
 			{
                 if (!queue)
                     unit.CommandProcessor.Clear();
 
                 var command = CommandFactory.GetOrCreate(commandType);
-                command.Init(target, formation);
+                command.Init(formation.GetTargePos(index++));
 
                 unit.CommandProcessor.Add(command);
 			}
-		}
-	}
+
+            _lastFormation = formation;
+            FormationFactory.Release(formation);
+        }
+
+        private Formation _lastFormation;
+        private List<Color> _colors = new List<Color>();
+        private void OnDrawGizmosSelected()
+        {
+            if (_lastFormation == null)
+                return;
+
+            int index = 0;
+            foreach (var slot in _lastFormation.GetSlots())
+            {
+                if (index >= _colors.Count)
+                    _colors.Add(Random.ColorHSV());
+
+                Gizmos.color = _colors[index++];
+                Gizmos.DrawSphere(slot.TargetPos + new Vector3(0, 0.5f, 0), 0.5f);
+                Gizmos.DrawSphere(slot.Pos + new Vector3(0, 0.5f, 0), 0.5f);
+                Gizmos.DrawLine(slot.Pos + new Vector3(0, 0.5f, 0), slot.TargetPos + new Vector3(0, 0.5f, 0));
+            }
+        }
+    }
 }

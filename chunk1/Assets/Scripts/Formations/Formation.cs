@@ -6,7 +6,7 @@ using UnityEngine.AI;
 
 namespace Assets.Scripts.Formations
 {
-    public class Slot
+    public class FormationSlot
     {
         public Vector3 Pos;
         public Vector3 DeltaPos;
@@ -18,8 +18,8 @@ namespace Assets.Scripts.Formations
 
     public class Formation : IKeyProvider<FormationType>
     {
-        private List<Slot> _unitStash = new List<Slot>();
-        private List<Slot> _units = new List<Slot>();
+        private List<FormationSlot> _unitStash = new List<FormationSlot>();
+        private List<FormationSlot> _units = new List<FormationSlot>();
         private List<Vector3> _offsets = new List<Vector3>();
         private Vector3 _targetPosition;
         private int _unitsCount = 0;
@@ -27,7 +27,7 @@ namespace Assets.Scripts.Formations
         private DeltaPosComparer _deltaPosComparer = new DeltaPosComparer();
         private AngleComparer _angleComparer = new AngleComparer();
 
-        public float SlotSize = 1f;
+        public float SlotSize = 2f;
 
         private void ReserveRing(int ring)
         {
@@ -74,7 +74,7 @@ namespace Assets.Scripts.Formations
             foreach (var unit in units)
             {
                 if (_unitStash.Count <= index)
-                    _unitStash.Add(new Slot());
+                    _unitStash.Add(new FormationSlot());
                 _unitStash[index].Pos = unit;
                 _unitStash[index].Index = index;
                 _unitStash[index].TargetPos = _targetPosition;
@@ -89,25 +89,26 @@ namespace Assets.Scripts.Formations
         NavMeshPath _path = new NavMeshPath();
         public void Build()
         {
-            if (_unitStash.Count == 0)
+            if (_unitsCount == 0)
                 return;
 
-            var middle = Vector3.zero;
-            foreach (var unit in _unitStash)
-                middle += unit.Pos;
-            middle = middle / _unitStash.Count;
-            foreach (var unit in _unitStash)
-            {
-                unit.DeltaPos = unit.Pos - middle;
-                unit.Angle = Pseudoangle(unit.DeltaPos.x, unit.DeltaPos.z);
-                unit.DeltaPosSqrMagnitude = unit.DeltaPos.sqrMagnitude;
-            }
-
             _units.Clear();
-
             for (int i = 0; i < _unitsCount; i++)
                 _units.Add(_unitStash[i]);
+
+            var middle = GetMiddlePos(_unitStash, _unitsCount);
+            CalculateAngles(middle);
+            
+            var lastRingCount = LastRingUnitsCount();
+            if (lastRingCount > 0 && _unitsCount > 6)
+            {
+                _units.Sort(_deltaPosComparer);
+                middle = GetMiddlePos(_units, _unitsCount - lastRingCount);
+                CalculateAngles(middle);
+            }
+
             _units.Sort(_deltaPosComparer);
+
 
             int ring = 0;
             int assignedCount = 0;
@@ -117,21 +118,29 @@ namespace Assets.Scripts.Formations
                 ReserveRing(ring);
                 var ringCount = GetRingCount(ring);
                 var slotsToReserve = Mathf.Min(_units.Count - assignedCount, ringCount);
+                _angleComparer.SetRingOffset(ringCount);
                 _units.Sort(assignedCount, slotsToReserve, _angleComparer);
-                for (int i = lastOffset; i < lastOffset + ringCount && assignedCount < _units.Count; i++)
+                for (float i = lastOffset; (int)i < lastOffset + ringCount && assignedCount < _units.Count;)
                 {
                     NavMeshHit hit;
-                    var pos = _targetPosition + _offsets[i];
+                    var pos = _targetPosition + _offsets[(int)i];
                     var enabled = NavMesh.SamplePosition(pos, out hit, SlotSize / 2f, NavMesh.AllAreas);
                     if (enabled)
                     {
                         enabled = NavMesh.CalculatePath(_targetPosition, hit.position, NavMesh.AllAreas, _path);
-                        if (enabled && GetPathLength(_path) < ring * SlotSize * 2)
+                        if (enabled && (ring == 0 || GetPathLength(_path) < ring * SlotSize * 2))
                         {
                             _units[assignedCount].TargetPos = hit.position;
                             assignedCount++;
+                            if (slotsToReserve < ringCount && _unitsCount > 3)
+                            {
+                                i += (float)ringCount / slotsToReserve;
+                            }
+                            else i++;
                         }
+                        else i++;
                     }
+                    else i++;
                 }
                 lastOffset += ringCount;
                 ring++;
@@ -141,9 +150,66 @@ namespace Assets.Scripts.Formations
             }
         }
 
+        private void CalculateAngles(Vector3 middle)
+        {
+            for (int i = 0; i < _unitsCount; i++)
+            {
+                var unit = _unitStash[i];
+                unit.DeltaPos = unit.Pos - middle;
+                unit.Angle = Pseudoangle(unit.DeltaPos.x, unit.DeltaPos.z);
+                unit.DeltaPosSqrMagnitude = unit.DeltaPos.sqrMagnitude;
+            }
+        }
+
+        private int LastRingUnitsCount()
+        {
+            int count = _unitsCount;
+            int ring = 0;
+            var ringUnitCount = GetRingCount(0);
+            while (count > ringUnitCount)
+            {
+                count -= ringUnitCount;
+                ring++;
+                ringUnitCount = GetRingCount(ring);
+            }
+            return count;
+        }
+
+        private Vector3 GetMiddlePos(List<FormationSlot> units, int count)
+        {
+            var middle = Vector3.zero;
+            if (count < 4)
+            {
+                var lowestXZ = units[0].Pos.x + units[0].Pos.z;
+                middle = units[0].Pos;
+                for (int i = 0; i < count; i++)
+                {
+                    var xz = units[i].Pos.x + units[i].Pos.z;
+                    if (xz < lowestXZ)
+                    {
+                        lowestXZ = xz;
+                        middle = units[i].Pos;
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < count; i++)
+                    middle += units[i].Pos;
+                middle = middle / count;
+            }
+            return middle;
+        }
+
         public Vector3 GetTargePos(int index)
         {
             return _unitStash[index].TargetPos;
+        }
+
+        public IEnumerable<FormationSlot> GetSlots()
+        {
+            for (int i = 0; i < _unitsCount; i++)
+                yield return _unitStash[i];
         }
 
         public float GetPathLength(NavMeshPath path)
@@ -172,17 +238,27 @@ namespace Assets.Scripts.Formations
             return p;
         }
 
-        class AngleComparer : IComparer<Slot>
+        class AngleComparer : IComparer<FormationSlot>
         {
-            public int Compare(Slot a, Slot b)
+            float _offset = 0f;
+            const float _pseudoanglesPerRing = 4;
+
+            public void SetRingOffset(int slotsPerRing)
             {
-                return a.Angle.CompareTo(b.Angle);
+                _offset = (_pseudoanglesPerRing / (float)slotsPerRing) / 2f;
+            }
+
+            public int Compare(FormationSlot a, FormationSlot b)
+            {
+                var da = (_offset + a.Angle) % _pseudoanglesPerRing;
+                var db = (_offset + b.Angle) % _pseudoanglesPerRing;
+                return da.CompareTo(db);
             }
         }
 
-        class DeltaPosComparer : IComparer<Slot>
+        class DeltaPosComparer : IComparer<FormationSlot>
         {
-            public int Compare(Slot a, Slot b)
+            public int Compare(FormationSlot a, FormationSlot b)
             {
                 return a.DeltaPosSqrMagnitude.CompareTo(b.DeltaPosSqrMagnitude);
             }
