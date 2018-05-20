@@ -16,7 +16,10 @@ public class SelectionRectView : MonoBehaviour
 
 	public void Start()
 	{
-		SetVisible(false);
+        _rectTransform.anchoredPosition = Vector2.zero;
+        _rectTransform.sizeDelta = Vector2.zero;
+
+        SetVisible(false);
 
 		_selectionRect.OnRectStart += OnRectStart;
 		_selectionRect.OnRectFinish += OnRectFinish;
