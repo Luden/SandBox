@@ -44,14 +44,14 @@ namespace Assets.Scripts.Commands
 			}
 
 			_navMeshTarget = hit.position;
-            unit.NavMeshObstacle.enabled = false;
+            //unit.NavMeshObstacle.enabled = false;
 
             _timeManager.LateUpdateOnce(LateUpdate);
         }
 
         private void LateUpdate(float t)
         {
-            Unit.NavMeshAgent.enabled = true;
+            //Unit.NavMeshAgent.enabled = true;
             Unit.NavMeshAgent.SetDestination(_navMeshTarget);
             Unit.NavMeshAgent.avoidancePriority = 50; // Random.Range(10, 90);
             _stopCheckSpeedSquared = Unit.NavMeshAgent.speed * Unit.NavMeshAgent.speed * StopCheckSpeedPart;
@@ -60,10 +60,11 @@ namespace Assets.Scripts.Commands
 
         protected override void Stop()
         {
-            Unit.NavMeshAgent.ResetPath();
-            Unit.NavMeshAgent.avoidancePriority = StopPriority;
-            Unit.NavMeshAgent.enabled = false;
-            Unit.NavMeshObstacle.enabled = true;
+            if (Unit.NavMeshAgent.isOnNavMesh)
+                Unit.NavMeshAgent.ResetPath();
+            Unit.NavMeshAgent.avoidancePriority = 50;
+            //Unit.NavMeshAgent.enabled = false;
+            //Unit.NavMeshObstacle.enabled = true;
             base.Stop();
         }
 

@@ -1,4 +1,5 @@
-﻿using Assets.Scripts;
+﻿using System.Collections.Generic;
+using Assets.Scripts;
 using Assets.Scripts.Commands;
 using UnityEngine;
 using UnityEngine.AI;
@@ -14,7 +15,7 @@ public class Unit : MonoBehaviour
 	{
         Selectable = GetComponent<Selectable>();
 		NavMeshAgent = GetComponent<NavMeshAgent>();
-        NavMeshAgent.enabled = false;
+        //NavMeshAgent.enabled = false;
         NavMeshObstacle = GetComponent<NavMeshObstacle>();
 
         var provider = ManagerProvider.Instance;
@@ -25,4 +26,22 @@ public class Unit : MonoBehaviour
 	{
 		CommandProcessor.Stop();
 	}
+
+    HashSet<Unit> _neighbours = new HashSet<Unit>();
+    GameObject _reachedTarget = null;
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.tag == "Unit")
+            _neighbours.Add(other.gameObject.GetComponent<Unit>());
+
+        if (other.gameObject.tag == "Target")
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == "Unit")
+            _neighbours.Remove(other.gameObject.GetComponent<Unit>());
+    }
+
+    void CheckNeighboursReachedTarget(Vector2 point)
 }
