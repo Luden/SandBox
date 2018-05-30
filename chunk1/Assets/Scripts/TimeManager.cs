@@ -12,7 +12,8 @@ namespace Assets.Scripts
 		public float Period;
 		public float LastUpdate;
         public bool IsOnce;
-	}
+        public bool IsCancelled;
+    }
 
 	public class TimeManager : ManagerBase
 	{
@@ -39,19 +40,25 @@ namespace Assets.Scripts
 			task.Period = period;
 			task.LastUpdate = Time.time;
             task.IsOnce = false;
+            task.IsCancelled = false;
             _tasks.Add(task);
 			return task;
 		}
 
-        public void LateUpdateOnce(Action<float> update)
+        public RegularUpdate LateUpdateOnce(Action<float> update)
         {
             var task = StartUpdate(update, Time.fixedDeltaTime + Mathf.Epsilon);
             task.IsOnce = true;
+            return task;
         }
 
 		public void StopUpdate(RegularUpdate update)
 		{
-			_taskToRemove.Add(update);
+            if (update == null)
+                return;
+
+            update.IsCancelled = true;
+            _taskToRemove.Add(update);
 		}
 
 		private void FixedUpdate()
@@ -70,7 +77,7 @@ namespace Assets.Scripts
 
 			foreach (var task in _tasks)
 			{
-				if (task.LastUpdate + task.Period < time)
+				if (!task.IsCancelled && task.LastUpdate + task.Period < time)
 				{
 					task.Update(time - task.LastUpdate);
 					task.LastUpdate = time;
