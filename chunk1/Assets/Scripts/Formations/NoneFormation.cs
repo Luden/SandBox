@@ -5,10 +5,7 @@ using System.Text;
 
 namespace Assets.Scripts.Formations
 {
-    public enum FormationType
+    public class NoneFormation : FormationBase
     {
-        None,
-        Circle,
-        Croud
     }
 }

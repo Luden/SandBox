@@ -10,13 +10,16 @@ namespace Assets.Scripts.Commands
 		Vector3 _initialTarget;
 		Vector3 _navMeshTarget;
 
-        const int StopPriority = 1;
+        const int StopPriority = 50;
+        const int MovePriority = 48;
+        const int GiveWayPriority = 49;
         const float StopCheckSpeedPart = 0.1f;
         const float StopTime = 1f;
 
         float _stopCheckSpeedSquared = 0f;
-        float _stopingTime = 0f;
-
+        bool _alreadyReachedTarget = false;
+        float _lastDistanceToTarget = 0f;
+        RegularUpdate _lateUpdate;
         public override CommandType GetKey() { return CommandType.Move; }
 
         TimeManager _timeManager;
@@ -28,7 +31,8 @@ namespace Assets.Scripts.Commands
 
         public override void Init(Vector3 target)
 		{
-			_navMeshTarget = _initialTarget = target;
+            _alreadyReachedTarget = false;
+            _navMeshTarget = _initialTarget = target;
 			base.Init(target);
 		}
 
@@ -44,26 +48,33 @@ namespace Assets.Scripts.Commands
 			}
 
 			_navMeshTarget = hit.position;
-            unit.NavMeshObstacle.enabled = false;
+            //unit.NavMeshObstacle.enabled = false;
 
-            _timeManager.LateUpdateOnce(LateUpdate);
+            _lateUpdate = _timeManager.LateUpdateOnce(LateUpdate);
         }
 
         private void LateUpdate(float t)
         {
-            Unit.NavMeshAgent.enabled = true;
+            //Unit.NavMeshAgent.enabled = true;
+            _lateUpdate = null;
             Unit.NavMeshAgent.SetDestination(_navMeshTarget);
-            Unit.NavMeshAgent.avoidancePriority = 50; // Random.Range(10, 90);
+            Unit.NavMeshAgent.avoidancePriority = MovePriority;
             _stopCheckSpeedSquared = Unit.NavMeshAgent.speed * Unit.NavMeshAgent.speed * StopCheckSpeedPart;
-            _stopingTime = 0f;
         }
 
         protected override void Stop()
         {
-            Unit.NavMeshAgent.ResetPath();
+            if (Unit.NavMeshAgent.isOnNavMesh)
+                Unit.NavMeshAgent.ResetPath();
             Unit.NavMeshAgent.avoidancePriority = StopPriority;
-            Unit.NavMeshAgent.enabled = false;
-            Unit.NavMeshObstacle.enabled = true;
+
+            if (_lateUpdate != null)
+            {
+                _timeManager.StopUpdate(_lateUpdate);
+                _lateUpdate = null;
+            }
+            //Unit.NavMeshAgent.enabled = false;
+            //Unit.NavMeshObstacle.enabled = true;
             base.Stop();
         }
 
@@ -77,24 +88,61 @@ namespace Assets.Scripts.Commands
             if (Unit.NavMeshAgent.pathPending)
                 return;
 
-			if (Unit.NavMeshAgent.remainingDistance <= Unit.NavMeshAgent.stoppingDistance)
-			{
-				if (!Unit.NavMeshAgent.hasPath || Unit.NavMeshAgent.velocity.sqrMagnitude == 0f)
-				{
-					Finish();
-				}
-			}
+            if (_lateUpdate != null)
+                return;
 
-            if (Unit.NavMeshAgent.velocity.sqrMagnitude < _stopCheckSpeedSquared)
+            UpdatePathComplete();
+
+            UpdateReachedByNeighbour();
+
+            UpdatePushedAway();
+
+            UpdateGiveWay();
+        }
+
+        private void UpdatePathComplete()
+        {
+            if (Unit.NavMeshAgent.remainingDistance <= Unit.NavMeshAgent.stoppingDistance)
             {
-                _stopingTime += dt;
-                if (_stopingTime > StopTime)
+                if (!Unit.NavMeshAgent.hasPath || Unit.NavMeshAgent.velocity.sqrMagnitude == 0f)
+                {
                     Finish();
+                }
+            }
+        }
+
+        private void UpdateReachedByNeighbour()
+        {
+            if (Unit.Neighbourhood.IsNeighboursReachedTarget(_navMeshTarget))
+                Finish();
+        }
+
+        private void UpdatePushedAway()
+        {
+            if (!_alreadyReachedTarget && Unit.Neighbourhood.IsUnitReachedTarget(_navMeshTarget))
+            {
+                _alreadyReachedTarget = true;
+                _lastDistanceToTarget = Unit.NavMeshAgent.remainingDistance;
+            }
+
+            if (_alreadyReachedTarget && Unit.NavMeshAgent.remainingDistance > _lastDistanceToTarget)
+                Finish();
+        }
+
+        private void UpdateGiveWay()
+        {
+            var opposer = Unit.Neighbourhood.GetOppositeNeighbour();
+            if (opposer != null)
+            {
+                if (Unit.NavMeshAgent.avoidancePriority != GiveWayPriority
+                    && opposer.NavMeshAgent.avoidancePriority != GiveWayPriority)
+                    Unit.NavMeshAgent.avoidancePriority = GiveWayPriority;
             }
             else
             {
-                _stopingTime = 0f;
+                if (Unit.NavMeshAgent.avoidancePriority == GiveWayPriority)
+                    Unit.NavMeshAgent.avoidancePriority = MovePriority;
             }
-		}
+        }
 	}
 }

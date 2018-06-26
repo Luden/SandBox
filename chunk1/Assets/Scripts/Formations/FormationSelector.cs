@@ -1,0 +1,27 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Assets.Scripts.Commands;
+using Assets.Scripts.Movement;
+using UnityEngine;
+
+namespace Assets.Scripts.Formations
+{
+    public class FormationSelector
+    {
+        public static FormationType GetFormationType(
+            IEnumerable<Unit> units, Vector3 target, CommandType commandType)
+        {
+            if (Neighbourhood.IsNeighbours(units))
+            {
+                if (units.Any(x => x.Neighbourhood.IsUnitReachedTarget(target)))
+                    return FormationType.Circle;
+                else
+                    return FormationType.Croud;
+            }
+
+            return FormationType.None;
+        }
+    }
+}

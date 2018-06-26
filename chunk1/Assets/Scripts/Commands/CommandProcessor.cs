@@ -34,6 +34,11 @@ namespace Assets.Scripts.Commands
             Wake();
         }
 
+        public bool IsMoving()
+        {
+            return _currentCommand != null && _currentCommand.GetKey() == CommandType.Move;
+        }
+
         public void Clear()
         {
             if (_currentCommand != null)

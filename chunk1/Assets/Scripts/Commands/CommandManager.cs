@@ -29,7 +29,8 @@ namespace Assets.Scripts.Commands
             _units.Clear();
             _units.AddRange(_unitsManager.Units.Where(unit => unit.Selectable.Selected));
 
-            var formation = FormationFactory.GetOrCreate(FormationFactory.GetFormationType(commandType));
+            var formation = FormationFactory.GetOrCreate(
+                FormationSelector.GetFormationType(_units, target, commandType));
             formation.Init(_units.Select(x => x.transform.position), target);
 
             int index = 0;
@@ -44,28 +45,28 @@ namespace Assets.Scripts.Commands
                 unit.CommandProcessor.Add(command);
 			}
 
-            _lastFormation = formation;
+            //_lastFormation = formation;
             FormationFactory.Release(formation);
         }
 
-        private Formation _lastFormation;
-        private List<Color> _colors = new List<Color>();
-        private void OnDrawGizmosSelected()
-        {
-            if (_lastFormation == null)
-                return;
+        //private Formation _lastFormation;
+        //private List<Color> _colors = new List<Color>();
+        //private void OnDrawGizmosSelected()
+        //{
+        //    if (_lastFormation == null)
+        //        return;
 
-            int index = 0;
-            foreach (var slot in _lastFormation.GetSlots())
-            {
-                if (index >= _colors.Count)
-                    _colors.Add(Random.ColorHSV());
+        //    int index = 0;
+        //    foreach (var slot in _lastFormation.GetSlots())
+        //    {
+        //        if (index >= _colors.Count)
+        //            _colors.Add(Random.ColorHSV());
 
-                Gizmos.color = _colors[index++];
-                Gizmos.DrawSphere(slot.TargetPos + new Vector3(0, 0.5f, 0), 0.5f);
-                Gizmos.DrawSphere(slot.Pos + new Vector3(0, 0.5f, 0), 0.5f);
-                Gizmos.DrawLine(slot.Pos + new Vector3(0, 0.5f, 0), slot.TargetPos + new Vector3(0, 0.5f, 0));
-            }
-        }
+        //        Gizmos.color = _colors[index++];
+        //        Gizmos.DrawSphere(slot.TargetPos + new Vector3(0, 0.5f, 0), 0.5f);
+        //        Gizmos.DrawSphere(slot.Pos + new Vector3(0, 0.5f, 0), 0.5f);
+        //        Gizmos.DrawLine(slot.Pos + new Vector3(0, 0.5f, 0), slot.TargetPos + new Vector3(0, 0.5f, 0));
+        //    }
+        //}
     }
 }

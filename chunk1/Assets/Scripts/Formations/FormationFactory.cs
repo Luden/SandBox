@@ -7,11 +7,21 @@ using Assets.Scripts.Core;
 
 namespace Assets.Scripts.Formations
 {
-    public class FormationFactory : Pool<FormationType, Formation>
+    public class FormationFactory : Pool<FormationType, FormationBase>
     {
-        public FormationType GetFormationType(CommandType commandType)
+        protected override FormationBase Create(FormationType key)
         {
-            return FormationType.Movement;
+            switch (key)
+            {
+                case FormationType.Circle:
+                    return new CircleFormation();
+                case FormationType.Croud:
+                    return new CroudFormation();
+                case FormationType.None:
+                    return new NoneFormation();
+                default:
+                    return null;
+            }
         }
     }
 }
