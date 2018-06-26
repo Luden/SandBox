@@ -18,14 +18,28 @@ namespace Assets.Scripts.InputContext
 		public override void Enable()
 		{
 			_inputManager.SelectionRect.OnRectFinish += OnRectFinish;
-		}
+            _inputManager.SelectionRect.OnRectUpdate += OnRectUpdate;
+            _inputManager.SelectionRect.OnIdle += OnRectIdle;
+        }
 
 		public override void Disable()
 		{
 			_inputManager.SelectionRect.OnRectFinish -= OnRectFinish;
-		}
+            _inputManager.SelectionRect.OnRectUpdate -= OnRectUpdate;
+            _inputManager.SelectionRect.OnIdle -= OnRectIdle;
+        }
 
-		private void OnRectFinish(Vector3 start, Vector3 finish)
+        private void OnRectIdle(Vector3 position)
+        {
+            _selectionManager.ProcessPreselection(position);
+        }
+
+        private void OnRectUpdate(Vector3 start, Vector3 finish)
+        {
+            _selectionManager.ProcessPreselection(start, finish);
+        }
+
+        private void OnRectFinish(Vector3 start, Vector3 finish)
 		{
 			_selectionManager.ProcessSelection(start, finish);
 		}

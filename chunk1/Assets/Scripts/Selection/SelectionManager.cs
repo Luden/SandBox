@@ -23,7 +23,34 @@ public class SelectionManager : ManagerBase
         _unitsManager = ManagerProvider.Instance.UnitManager;
     }
 
-	public void ProcessSelection(Vector3 screenPos1, Vector3 screenPos2)
+    public void ProcessPreselection(Vector3 screenPos1, Vector3 screenPos2)
+    {
+        foreach (var unit in _unitsManager.Units)
+        {
+            var selectable = unit.Selectable;
+            var inRect = CheckInRect(screenPos1, screenPos2, selectable);
+            if (!selectable.Preselected && inRect)
+                selectable.Preselected = true;
+            else if (selectable.Preselected && !inRect)
+                selectable.Preselected = false;
+        }
+    }
+
+    private bool CheckInRect(Vector3 screenPos1, Vector3 screenPos2, ISelectable selectable)
+    {
+        var unitScreenPos = _mainCamera.WorldToScreenPoint(selectable.Position);
+        return unitScreenPos.x + selectable.Radius > screenPos1.x && unitScreenPos.x - selectable.Radius < screenPos2.x
+            && unitScreenPos.y + selectable.Radius > screenPos1.y && unitScreenPos.y - selectable.Radius < screenPos2.y;
+    }
+
+    public void ProcessPreselection(Vector3 screenPos)
+    {
+        var hoverUnit = GetUnitUnderCursor(screenPos);
+        foreach (var unit in _unitsManager.Units)
+            unit.Selectable.Preselected = unit.Selectable == hoverUnit;
+    }
+
+    public void ProcessSelection(Vector3 screenPos1, Vector3 screenPos2)
 	{
 		_selectedUnits.Clear();
 		_recentlySelectedUnits.Clear();
@@ -32,12 +59,8 @@ public class SelectionManager : ManagerBase
 		foreach (var unit in _unitsManager.Units)
         {
             var selectable = unit.Selectable;
-
-            var unitScreenPos = _mainCamera.WorldToScreenPoint(selectable.Position);
-            var inRect = unitScreenPos.x > screenPos1.x && unitScreenPos.x < screenPos2.x
-                && unitScreenPos.y > screenPos1.y && unitScreenPos.y < screenPos2.y;
-
-			if (!selectable.Selected && inRect)
+            var inRect = CheckInRect(screenPos1, screenPos2, selectable);
+            if (!selectable.Selected && inRect)
 			{
 				_recentlySelectedUnits.Add(selectable);
 				selectable.Selected = true;

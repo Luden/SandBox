@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class SelectionRect : MonoBehaviour
 {
+    public Action<Vector3> OnIdle;
+
 	public Action<Vector3, Vector3> OnRectStart;
 	public Action<Vector3, Vector3> OnRectFinish;
     public Action<Vector3, Vector3> OnRectUpdate;
@@ -18,23 +20,27 @@ public class SelectionRect : MonoBehaviour
 
 	public void Update()
 	{
-		if (!_started && Input.GetMouseButtonDown(0))
-		{
-			StartRect(Input.mousePosition, 0);
-		}
-		else if (!_started && Input.GetMouseButtonDown(1))
-		{
-			StartRect(Input.mousePosition, 1);
-		}
-		else if (_started && Input.GetMouseButtonUp(_startedButton))
-		{
-			FinishRect(Input.mousePosition);
-		}
-		else if (_started)
-		{
-			UpdateRect(Input.mousePosition);
-			FireEvent(_startedButton == 0 ? OnRectUpdate : OnRectUpdateRight);
-		}
+        if (!_started && Input.GetMouseButtonDown(0))
+        {
+            StartRect(Input.mousePosition, 0);
+        }
+        else if (!_started && Input.GetMouseButtonDown(1))
+        {
+            StartRect(Input.mousePosition, 1);
+        }
+        else if (_started && Input.GetMouseButtonUp(_startedButton))
+        {
+            FinishRect(Input.mousePosition);
+        }
+        else if (_started)
+        {
+            UpdateRect(Input.mousePosition);
+            FireEvent(_startedButton == 0 ? OnRectUpdate : OnRectUpdateRight);
+        }
+        else
+        {
+            OnIdle(Input.mousePosition);
+        }
 	}
 
 	public void StartRect(Vector3 position, int button)

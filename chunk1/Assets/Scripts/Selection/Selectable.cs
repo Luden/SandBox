@@ -6,8 +6,11 @@ namespace Assets.Scripts
     class Selectable : MonoBehaviour, ISelectable
     {
         public Action<bool> OnSelectionChange { get; set; }
+        public Action<bool> OnPreselectionChange { get; set; }
 
         private Transform _transform;
+
+        public float Radius { get { return 0.5f; } }
 
         bool _selected;
         public bool Selected
@@ -19,6 +22,20 @@ namespace Assets.Scripts
                 {
                     _selected = value;
                     OnSelectionChange(_selected);
+                }
+            }
+        }
+
+        bool _preselected;
+        public bool Preselected
+        {
+            get { return _preselected; }
+            set
+            {
+                if (_preselected != value)
+                {
+                    _preselected = value;
+                    OnPreselectionChange(_preselected);
                 }
             }
         }
