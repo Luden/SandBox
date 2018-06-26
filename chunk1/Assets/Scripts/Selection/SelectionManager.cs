@@ -63,7 +63,7 @@ public class SelectionManager : ManagerBase
 	{
 		RaycastHit hit;
 		var ray = _mainCamera.ScreenPointToRay(screenPos);
-		if (Physics.Raycast(ray, out hit, 1000, ~LayerMask.NameToLayer("Units")))
+		if (Physics.Raycast(ray, out hit, 1000f, (1 << LayerMask.NameToLayer("Units"))))
 			return hit.transform.GetComponent<Selectable>();
 		return null;
 	}
@@ -72,7 +72,7 @@ public class SelectionManager : ManagerBase
 	{
 		RaycastHit hit;
 		var ray = _mainCamera.ScreenPointToRay(screenPos);
-		if (Physics.Raycast(ray, out hit, 1000, ~LayerMask.NameToLayer("Terrain")))
+		if (Physics.Raycast(ray, out hit, 1000f, (1 << LayerMask.NameToLayer("Terrain"))))
 			return hit.point;
 
 		return Vector3.zero;

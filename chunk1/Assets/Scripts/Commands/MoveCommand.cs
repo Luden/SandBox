@@ -113,13 +113,13 @@ namespace Assets.Scripts.Commands
 
         private void UpdateReachedByNeighbour()
         {
-            if (Unit.IsNeighboursReachedTarget(_navMeshTarget))
+            if (Unit.Neighbourhood.IsNeighboursReachedTarget(_navMeshTarget))
                 Finish();
         }
 
         private void UpdatePushedAway()
         {
-            if (!_alreadyReachedTarget && Unit.IsUnitReachedTarget(_navMeshTarget))
+            if (!_alreadyReachedTarget && Unit.Neighbourhood.IsUnitReachedTarget(_navMeshTarget))
             {
                 _alreadyReachedTarget = true;
                 _lastDistanceToTarget = Unit.NavMeshAgent.remainingDistance;
@@ -131,7 +131,7 @@ namespace Assets.Scripts.Commands
 
         private void UpdateGiveWay()
         {
-            var opposer = Unit.GetOppositeNeighbour();
+            var opposer = Unit.Neighbourhood.GetOppositeNeighbour();
             if (opposer != null)
             {
                 if (Unit.NavMeshAgent.avoidancePriority != GiveWayPriority

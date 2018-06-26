@@ -29,8 +29,9 @@ namespace Assets.Scripts.Commands
             _units.Clear();
             _units.AddRange(_unitsManager.Units.Where(unit => unit.Selectable.Selected));
 
-            //var formation = FormationFactory.GetOrCreate(FormationFactory.GetFormationType(commandType));
-            //formation.Init(_units.Select(x => x.transform.position), target);
+            var formation = FormationFactory.GetOrCreate(
+                FormationSelector.GetFormationType(_units, target, commandType));
+            formation.Init(_units.Select(x => x.transform.position), target);
 
             int index = 0;
             foreach (var unit in _units)
@@ -39,13 +40,13 @@ namespace Assets.Scripts.Commands
                     unit.CommandProcessor.Clear();
 
                 var command = CommandFactory.GetOrCreate(commandType);
-                command.Init(target);
+                command.Init(formation.GetTargePos(index++));
 
                 unit.CommandProcessor.Add(command);
 			}
 
             //_lastFormation = formation;
-            //FormationFactory.Release(formation);
+            FormationFactory.Release(formation);
         }
 
         //private Formation _lastFormation;
