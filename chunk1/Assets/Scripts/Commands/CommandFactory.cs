@@ -19,7 +19,7 @@ namespace Assets.Scripts.Commands
 		{
 			switch (commandType)
 			{
-				case CommandType.Move: return new MoveCommand(_timeManager);
+				case CommandType.Move: return new MoveCommand();
 				default: return null;
 			}
 		}

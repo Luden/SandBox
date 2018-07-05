@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Assets.Scripts.Core;
 
 namespace Assets.Scripts.Movement
 {
@@ -14,66 +15,52 @@ namespace Assets.Scripts.Movement
             _navMeshAgent = GetComponent<NavMeshAgent>();
         }
 
-        HashSet<Unit> _neighbours = new HashSet<Unit>();
+        HashSet<Navigation> _neighbours = new HashSet<Navigation>();
         GameObject _reachedTarget = null;
         void OnTriggerEnter(Collider other)
         {
-            if (other.gameObject.tag == "Unit")
-                _neighbours.Add(other.gameObject.GetComponent<Unit>());
+            if (other.gameObject.tag == Tags.Unit)
+                _neighbours.Add(other.gameObject.GetComponent<Navigation>());
         }
 
         void OnTriggerExit(Collider other)
         {
-            if (other.gameObject.tag == "Unit")
-                _neighbours.Remove(other.gameObject.GetComponent<Unit>());
+            if (other.gameObject.tag == Tags.Unit)
+                _neighbours.Remove(other.gameObject.GetComponent<Navigation>());
         }
 
         int _visitorHash = -1;
-        List<Unit> _cacheNeighbours = new List<Unit>();
-        List<Unit> GetNeighbours(bool isMoving)
+        List<Navigation> _cacheNeighbours = new List<Navigation>();
+        List<Navigation> GetNeighbours(bool isMoving)
         {
             _cacheNeighbours.Clear();
             foreach (var unit in _neighbours)
-                if (unit.CommandProcessor.IsMoving() == isMoving)
+                if (unit.IsMoving == isMoving)
                     _cacheNeighbours.Add(unit);
             return _cacheNeighbours;
         }
 
-        bool IsUnitOrNeighboursReachedTarget(Vector3 point, int visitorHash)
+        public bool IsNeighboursReachedTarget(Vector3 point, int visitorHash)
         {
-            if (visitorHash == _visitorHash)
+            if (visitorHash == -1)
+                RebuildHash();
+            else if (visitorHash == _visitorHash)
                 return false;
+            else
+                _visitorHash = visitorHash;
 
-            _visitorHash = visitorHash;
-
-            return IsUnitReachedTarget(point) || IsNeighboursReachedTarget(point, visitorHash);
-        }
-
-        public bool IsUnitReachedTarget(Vector3 point)
-        {
-            return (transform.position - point).sqrMagnitude < 1f;
-        }
-
-        public bool IsNeighboursReachedTarget(Vector3 point)
-        {
-            RebuildHash();
-            return IsNeighboursReachedTarget(point, _visitorHash) && _neighbours.Count > 1;
-        }
-
-        bool IsNeighboursReachedTarget(Vector3 point, int visitorHash)
-        {
             var staticNeighbours = GetNeighbours(false);
             if (staticNeighbours.Count == 0)
                 return false;
 
             foreach (var unit in staticNeighbours)
-                if (unit.Neighbourhood.IsUnitOrNeighboursReachedTarget(point, visitorHash))
+                if (unit.IsUnitOrNeighboursReachedTarget(point, _visitorHash))
                     return true;
 
             return false;
         }
 
-        public Unit GetOppositeNeighbour()
+        public Navigation GetOppositeNeighbour()
         {
             var direction = _navMeshAgent.steeringTarget - transform.position;
             foreach (var unit in GetNeighbours(true))
@@ -96,12 +83,12 @@ namespace Assets.Scripts.Movement
             if (anyUnit == null)
                 return false;
 
-            anyUnit.Neighbourhood.RebuildHash();
-            foreach (var unit in anyUnit.Neighbourhood._neighbours)
-                unit.Neighbourhood.MarkNeighbours(anyUnit.Neighbourhood._visitorHash);
+            anyUnit.Navigation.Neighbourhood.RebuildHash();
+            foreach (var unit in anyUnit.Navigation.Neighbourhood._neighbours)
+                unit.Neighbourhood.MarkNeighbours(anyUnit.Navigation.Neighbourhood._visitorHash);
 
             foreach (var unit in units)
-                if (unit.Neighbourhood._visitorHash != anyUnit.Neighbourhood._visitorHash)
+                if (unit.Navigation.Neighbourhood._visitorHash != anyUnit.Navigation.Neighbourhood._visitorHash)
                     return false;
 
             return true;

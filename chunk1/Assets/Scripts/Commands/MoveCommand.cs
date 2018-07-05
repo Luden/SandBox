@@ -6,143 +6,47 @@ using UnityEngine.AI;
 namespace Assets.Scripts.Commands
 {
     public class MoveCommand : CommandBase
-	{
-		Vector3 _initialTarget;
-		Vector3 _navMeshTarget;
+    {
+        Vector3 _initialTarget;
 
-        const int StopPriority = 50;
-        const int MovePriority = 48;
-        const int GiveWayPriority = 49;
-        const float StopCheckSpeedPart = 0.1f;
-        const float StopTime = 1f;
-
-        float _stopCheckSpeedSquared = 0f;
-        bool _alreadyReachedTarget = false;
-        float _lastDistanceToTarget = 0f;
-        RegularUpdate _lateUpdate;
         public override CommandType GetKey() { return CommandType.Move; }
 
-        TimeManager _timeManager;
-
-        public MoveCommand(TimeManager timeManager) : base()
+        public MoveCommand() : base()
         {
-            _timeManager = timeManager;
         }
 
         public override void Init(Vector3 target)
-		{
-            _alreadyReachedTarget = false;
-            _navMeshTarget = _initialTarget = target;
-			base.Init(target);
-		}
-
-		public override void Start(Unit unit)
-		{
-            base.Start(unit);
-
-            NavMeshHit hit;
-			if (!NavMesh.SamplePosition(_initialTarget, out hit, 100f, NavMesh.AllAreas))
-			{
-				Cancel();
-				return;
-			}
-
-			_navMeshTarget = hit.position;
-            //unit.NavMeshObstacle.enabled = false;
-
-            _lateUpdate = _timeManager.LateUpdateOnce(LateUpdate);
+        {
+            _initialTarget = target;
+            base.Init(target);
         }
 
-        private void LateUpdate(float t)
+        public override void Start(Unit unit)
         {
-            //Unit.NavMeshAgent.enabled = true;
-            _lateUpdate = null;
-            Unit.NavMeshAgent.SetDestination(_navMeshTarget);
-            Unit.NavMeshAgent.avoidancePriority = MovePriority;
-            _stopCheckSpeedSquared = Unit.NavMeshAgent.speed * Unit.NavMeshAgent.speed * StopCheckSpeedPart;
+            base.Start(unit);
+
+            Unit.Navigation.OnCancel += OnMoveCancel;
+            Unit.Navigation.OnFinish += OnMoveFinish;
+            Unit.Navigation.Go(_initialTarget);
+        }
+
+        private void OnMoveCancel()
+        {
+            Cancel();
+        }
+
+        private void OnMoveFinish()
+        {
+            Finish();
         }
 
         protected override void Stop()
         {
-            if (Unit.NavMeshAgent.isOnNavMesh)
-                Unit.NavMeshAgent.ResetPath();
-            Unit.NavMeshAgent.avoidancePriority = StopPriority;
+            Unit.Navigation.OnCancel -= OnMoveCancel;
+            Unit.Navigation.OnFinish -= OnMoveFinish;
 
-            if (_lateUpdate != null)
-            {
-                _timeManager.StopUpdate(_lateUpdate);
-                _lateUpdate = null;
-            }
-            //Unit.NavMeshAgent.enabled = false;
-            //Unit.NavMeshObstacle.enabled = true;
+            Unit.Navigation.Stop();
             base.Stop();
-        }
-
-        public override void Update(float dt)
-		{
-            base.Update(dt);
-
-            if (!Unit.NavMeshAgent.enabled)
-                return;
-
-            if (Unit.NavMeshAgent.pathPending)
-                return;
-
-            if (_lateUpdate != null)
-                return;
-
-            UpdatePathComplete();
-
-            UpdateReachedByNeighbour();
-
-            UpdatePushedAway();
-
-            UpdateGiveWay();
-        }
-
-        private void UpdatePathComplete()
-        {
-            if (Unit.NavMeshAgent.remainingDistance <= Unit.NavMeshAgent.stoppingDistance)
-            {
-                if (!Unit.NavMeshAgent.hasPath || Unit.NavMeshAgent.velocity.sqrMagnitude == 0f)
-                {
-                    Finish();
-                }
-            }
-        }
-
-        private void UpdateReachedByNeighbour()
-        {
-            if (Unit.Neighbourhood.IsNeighboursReachedTarget(_navMeshTarget))
-                Finish();
-        }
-
-        private void UpdatePushedAway()
-        {
-            if (!_alreadyReachedTarget && Unit.Neighbourhood.IsUnitReachedTarget(_navMeshTarget))
-            {
-                _alreadyReachedTarget = true;
-                _lastDistanceToTarget = Unit.NavMeshAgent.remainingDistance;
-            }
-
-            if (_alreadyReachedTarget && Unit.NavMeshAgent.remainingDistance > _lastDistanceToTarget)
-                Finish();
-        }
-
-        private void UpdateGiveWay()
-        {
-            var opposer = Unit.Neighbourhood.GetOppositeNeighbour();
-            if (opposer != null)
-            {
-                if (Unit.NavMeshAgent.avoidancePriority != GiveWayPriority
-                    && opposer.NavMeshAgent.avoidancePriority != GiveWayPriority)
-                    Unit.NavMeshAgent.avoidancePriority = GiveWayPriority;
-            }
-            else
-            {
-                if (Unit.NavMeshAgent.avoidancePriority == GiveWayPriority)
-                    Unit.NavMeshAgent.avoidancePriority = MovePriority;
-            }
         }
 	}
 }

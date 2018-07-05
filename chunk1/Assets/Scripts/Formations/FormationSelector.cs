@@ -15,7 +15,7 @@ namespace Assets.Scripts.Formations
         {
             if (Neighbourhood.IsNeighbours(units))
             {
-                if (units.Any(x => x.Neighbourhood.IsUnitReachedTarget(target)))
+                if (units.Any(x => x.Navigation.IsUnitReachedTarget(target)))
                     return FormationType.Circle;
                 else
                     return FormationType.Croud;
