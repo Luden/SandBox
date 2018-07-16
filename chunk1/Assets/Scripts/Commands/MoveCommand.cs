@@ -11,19 +11,15 @@ namespace Assets.Scripts.Commands
 
         public override CommandType GetKey() { return CommandType.Move; }
 
-        public MoveCommand() : base()
-        {
-        }
-
-        public override void Init(Vector3 target)
+        public override void Init(Unit unit, Vector3 target)
         {
             _initialTarget = target;
-            base.Init(target);
+            base.Init(unit, target);
         }
 
-        public override void Start(Unit unit)
+        public override void Start()
         {
-            base.Start(unit);
+            base.Start();
 
             Unit.Navigation.OnCancel += OnMoveCancel;
             Unit.Navigation.OnFinish += OnMoveFinish;

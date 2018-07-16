@@ -20,7 +20,8 @@ namespace Assets.Scripts.Commands
 			switch (commandType)
 			{
 				case CommandType.Move: return new MoveCommand();
-				default: return null;
+                case CommandType.Attack: return new AttackCommand();
+                default: return null;
 			}
 		}
 	}

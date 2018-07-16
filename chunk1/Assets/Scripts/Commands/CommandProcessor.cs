@@ -64,7 +64,7 @@ namespace Assets.Scripts.Commands
                 return;
 
             _currentCommand = _commands.Dequeue();
-            _currentCommand.Start(_owner);
+            _currentCommand.Start();
         }
 
         private void Sleep()

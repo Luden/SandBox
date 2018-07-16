@@ -3,6 +3,8 @@ using Assets.Scripts.Commands;
 using Assets.Scripts.Core;
 using Assets.Scripts.Input;
 using Assets.Scripts.InputContext;
+using Assets.Scripts.Player;
+using Assets.Scripts.Visibility;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -16,6 +18,8 @@ namespace Assets.Scripts
 		public CommandManager CommandManager;
 		public TimeManager TimeManager;
         public InputContextManager InputContextManager;
+        public PlayerManager PlayerManager;
+        public VisibilityManager VisibilityManager;
 
         private Dictionary<ManagerType, ManagerBase> _managers = new Dictionary<ManagerType, ManagerBase>();
 
@@ -31,6 +35,8 @@ namespace Assets.Scripts
             CommandManager = GameObject.FindObjectOfType<CommandManager>();
             TimeManager = GameObject.FindObjectOfType<TimeManager>();
             InputContextManager = GameObject.FindObjectOfType<InputContextManager>();
+            PlayerManager = GameObject.FindObjectOfType<PlayerManager>();
+            VisibilityManager = GameObject.FindObjectOfType<VisibilityManager>();
 
             _managers[UnitManager.ManagerType] = UnitManager;
             _managers[InputManager.ManagerType] = InputManager;
@@ -38,6 +44,8 @@ namespace Assets.Scripts
             _managers[CommandManager.ManagerType] = CommandManager;
             _managers[TimeManager.ManagerType] = TimeManager;
             _managers[InputContextManager.ManagerType] = InputContextManager;
+            _managers[PlayerManager.ManagerType] = PlayerManager;
+            _managers[VisibilityManager.ManagerType] = VisibilityManager;
 
             TimeManager.Init();
             UnitManager.Init();
@@ -45,6 +53,8 @@ namespace Assets.Scripts
             SelectionManager.Init();
             CommandManager.Init();
             InputContextManager.Init();
+            PlayerManager.Init();
+            VisibilityManager.Init();
         }
 	}
 }

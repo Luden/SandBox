@@ -3,6 +3,7 @@
     public enum CommandType
 	{
 		None,
-		Move
+		Move,
+        Attack,
 	}
 }

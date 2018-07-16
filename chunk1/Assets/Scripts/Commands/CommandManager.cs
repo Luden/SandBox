@@ -40,7 +40,7 @@ namespace Assets.Scripts.Commands
                     unit.CommandProcessor.Clear();
 
                 var command = CommandFactory.GetOrCreate(commandType);
-                command.Init(formation.GetTargePos(index++));
+                command.Init(unit, formation.GetTargePos(index++));
 
                 unit.CommandProcessor.Add(command);
 			}

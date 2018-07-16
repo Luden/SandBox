@@ -9,5 +9,7 @@
         Selection,
         Unit,
         Command,
+        Player,
+        Visibility
     }
 }

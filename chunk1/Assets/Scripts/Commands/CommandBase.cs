@@ -17,20 +17,25 @@ namespace Assets.Scripts.Commands
 
 		public virtual CommandType GetKey() { return CommandType.None; }
 
-		public virtual void Init()
+		public virtual void Init(Unit unit)
 		{
+            Unit = unit;
 			State = CommandState.Inited;
 		}
 
-		public virtual void Init(Vector3 target)
+        public virtual void Init(Unit unit, Unit target)
+        {
+            Init(unit);
+        }
+
+        public virtual void Init(Unit unit, Vector3 target)
 		{
-            Init();
+            Init(unit);
 		}
 
-		public virtual void Start(Unit unit)
+		public virtual void Start()
 		{
             State = CommandState.Started;
-            Unit = unit;
 		}
 
 		public virtual void Update(float dt)
