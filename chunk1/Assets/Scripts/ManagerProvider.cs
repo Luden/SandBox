@@ -3,8 +3,9 @@ using Assets.Scripts.Commands;
 using Assets.Scripts.Core;
 using Assets.Scripts.Input;
 using Assets.Scripts.InputContext;
-using Assets.Scripts.Player;
-using Assets.Scripts.Visibility;
+using Assets.Scripts.Players;
+using Assets.Scripts.Shots;
+using Assets.Scripts.Perception;
 using UnityEngine;
 
 namespace Assets.Scripts
@@ -20,6 +21,7 @@ namespace Assets.Scripts
         public InputContextManager InputContextManager;
         public PlayerManager PlayerManager;
         public VisibilityManager VisibilityManager;
+        public ShotsManager ShotsManager;
 
         private Dictionary<ManagerType, ManagerBase> _managers = new Dictionary<ManagerType, ManagerBase>();
 
@@ -37,6 +39,7 @@ namespace Assets.Scripts
             InputContextManager = GameObject.FindObjectOfType<InputContextManager>();
             PlayerManager = GameObject.FindObjectOfType<PlayerManager>();
             VisibilityManager = GameObject.FindObjectOfType<VisibilityManager>();
+            ShotsManager = GameObject.FindObjectOfType<ShotsManager>();
 
             _managers[UnitManager.ManagerType] = UnitManager;
             _managers[InputManager.ManagerType] = InputManager;
@@ -46,6 +49,7 @@ namespace Assets.Scripts
             _managers[InputContextManager.ManagerType] = InputContextManager;
             _managers[PlayerManager.ManagerType] = PlayerManager;
             _managers[VisibilityManager.ManagerType] = VisibilityManager;
+            _managers[ShotsManager.ManagerType] = ShotsManager;
 
             TimeManager.Init();
             UnitManager.Init();
@@ -55,6 +59,7 @@ namespace Assets.Scripts
             InputContextManager.Init();
             PlayerManager.Init();
             VisibilityManager.Init();
+            ShotsManager.Init();
         }
 	}
 }

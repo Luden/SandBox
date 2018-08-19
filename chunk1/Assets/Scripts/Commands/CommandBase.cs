@@ -1,6 +1,7 @@
 ﻿using System;
 using Assets.Scripts.Core;
 using Assets.Scripts.Formations;
+using Assets.Scripts.Units;
 using UnityEngine;
 
 namespace Assets.Scripts.Commands
@@ -17,18 +18,13 @@ namespace Assets.Scripts.Commands
 
 		public virtual CommandType GetKey() { return CommandType.None; }
 
-		public virtual void Init(Unit unit)
+		private void Init(Unit unit)
 		{
             Unit = unit;
 			State = CommandState.Inited;
 		}
 
-        public virtual void Init(Unit unit, Unit target)
-        {
-            Init(unit);
-        }
-
-        public virtual void Init(Unit unit, Vector3 target)
+        public virtual void Init(Unit unit, Vector3 targetPos, Unit targetUnit)
 		{
             Init(unit);
 		}

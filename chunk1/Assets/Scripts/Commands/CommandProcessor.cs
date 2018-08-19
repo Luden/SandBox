@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Assets.Scripts.Units;
 
 namespace Assets.Scripts.Commands
 {
@@ -24,14 +25,14 @@ namespace Assets.Scripts.Commands
 
         public void Stop()
         {
-            _timeManager.StopUpdate(_update);
+            _timeManager.StopUpdate(ref _update);
         }
 
         public void Add(CommandBase command)
         {
             _commands.Enqueue(command);
             TryStartCommand();
-            Wake();
+            _timeManager.StartUpdate(ref _update, Update, 0.1f);
         }
 
         public bool IsMoving()
@@ -67,30 +68,13 @@ namespace Assets.Scripts.Commands
             _currentCommand.Start();
         }
 
-        private void Sleep()
-        {
-            if (_update == null)
-                return;
-
-            _timeManager.StopUpdate(_update);
-            _update = null;
-        }
-
-        private void Wake()
-        {
-            if (_update != null)
-                return;
-
-            _update = _timeManager.StartUpdate(Update, 0.1f);
-        }
-
         public void Update(float dt)
         {
             TryStartCommand();
 
             if (_currentCommand == null)
             {
-                Sleep();
+                _timeManager.StopUpdate(ref _update);
                 return;
             }
 

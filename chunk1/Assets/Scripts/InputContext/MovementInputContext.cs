@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Assets.Scripts.Commands;
 using Assets.Scripts.Input;
+using Assets.Scripts.Units;
 using UnityEngine;
 
 namespace Assets.Scripts.InputContext
@@ -11,7 +12,7 @@ namespace Assets.Scripts.InputContext
 		private SelectionManager _selectionManager;
 		private CommandManager _commandManager;
 
-		public MovementInputContext(ManagerProvider provider)
+        public MovementInputContext(ManagerProvider provider)
 			: base(provider)
 		{
 			_inputManager = provider.InputManager;
@@ -33,7 +34,7 @@ namespace Assets.Scripts.InputContext
             base.Disable();
 		}
 
-		private void OnSelectionChange(List<ISelectable> selected, List<ISelectable> added, List<ISelectable> removed)
+		private void OnSelectionChange(List<Unit> selected, List<Unit> added, List<Unit> removed)
 		{
 			if (!IsEnabled() && selected.Count > 0)
 				Enable();
@@ -43,9 +44,20 @@ namespace Assets.Scripts.InputContext
 
 		private void OnRightClick(Vector3 start, Vector3 finish)
 		{
-			var target = _selectionManager.TraceTerrain(start);
-			if (target != Vector3.zero)
-				_commandManager.Send(CommandType.Move, target, _inputManager.KeyInput.IsShift());
+            if (!_selectionManager.HasSelectedUnits())
+                return;
+
+            if (_selectionManager.UnitUnderCursor != null 
+                && _selectionManager.UnitUnderCursor.Player.IsEnemy())
+            {
+                _commandManager.Send(CommandType.Attack, _selectionManager.UnitUnderCursor.Navigation.Position, _selectionManager.UnitUnderCursor, _inputManager.KeyInput.IsShift());
+            }
+            else
+            {
+                var target = _selectionManager.TraceTerrain(start);
+                if (target != Vector3.zero)
+                    _commandManager.Send(CommandType.Move, target, null, _inputManager.KeyInput.IsShift());
+            }
 		}
 	}
 }

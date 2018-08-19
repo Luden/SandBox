@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Assets.Scripts.Core;
 using Assets.Scripts.Formations;
 using UnityEngine;
+using Assets.Scripts.Units;
 
 namespace Assets.Scripts.Commands
 {
@@ -24,14 +25,14 @@ namespace Assets.Scripts.Commands
             FormationFactory = new FormationFactory();
         }
 
-		public void Send(CommandType commandType, Vector3 target, bool queue)
+        public void Send(CommandType commandType, Vector3 targetPos, Unit targetUnit, bool queue)
 		{
             _units.Clear();
             _units.AddRange(_unitsManager.Units.Where(unit => unit.Selectable.Selected));
 
             var formation = FormationFactory.GetOrCreate(
-                FormationSelector.GetFormationType(_units, target, commandType));
-            formation.Init(_units.Select(x => x.transform.position), target);
+                FormationSelector.GetFormationType(_units, targetPos, commandType));
+            formation.Init(_units.Select(x => x.transform.position), targetPos);
 
             int index = 0;
             foreach (var unit in _units)
@@ -40,7 +41,7 @@ namespace Assets.Scripts.Commands
                     unit.CommandProcessor.Clear();
 
                 var command = CommandFactory.GetOrCreate(commandType);
-                command.Init(unit, formation.GetTargePos(index++));
+                command.Init(unit, formation.GetTargePos(index++), targetUnit);
 
                 unit.CommandProcessor.Add(command);
 			}

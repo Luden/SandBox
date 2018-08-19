@@ -31,6 +31,9 @@ namespace Assets.Scripts.Movement
         bool _alreadyReachedTarget = false;
         float _lastDistanceToTarget = 0f;
 
+        public Vector3 Position { get { return transform.position; } }
+        public float Pitch { get { return transform.rotation.eulerAngles.y; } }
+
         public void Start()
         {
             var provider = ManagerProvider.Instance;
@@ -57,7 +60,7 @@ namespace Assets.Scripts.Movement
             NavMeshAgent.SetDestination(_navMeshTarget);
             NavMeshAgent.avoidancePriority = MovePriority;
             _stopCheckSpeedSquared = NavMeshAgent.speed * NavMeshAgent.speed * StopCheckSpeedPart;
-            _update = _timeManager.StartUpdate(RegularUpdate, 0.1f);
+            _timeManager.StartUpdate(ref _update, RegularUpdate, 0.1f);
         }
 
         public bool IsMoving { get; private set; }
@@ -82,12 +85,7 @@ namespace Assets.Scripts.Movement
             if (NavMeshAgent.isOnNavMesh)
                 NavMeshAgent.ResetPath();
             NavMeshAgent.avoidancePriority = StopPriority;
-
-            if (_update != null)
-            {
-                _timeManager.StopUpdate(_update);
-                _update = null;
-            }
+            _timeManager.StopUpdate(ref _update);
         }
 
         public void RegularUpdate(float dt)

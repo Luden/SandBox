@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using Assets.Scripts.Formations;
+using Assets.Scripts.Units;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -11,10 +12,10 @@ namespace Assets.Scripts.Commands
 
         public override CommandType GetKey() { return CommandType.Move; }
 
-        public override void Init(Unit unit, Vector3 target)
+        public override void Init(Unit unit, Vector3 targetPos, Unit targetUnit)
         {
-            _initialTarget = target;
-            base.Init(unit, target);
+            _initialTarget = targetPos;
+            base.Init(unit, targetPos, targetUnit);
         }
 
         public override void Start()

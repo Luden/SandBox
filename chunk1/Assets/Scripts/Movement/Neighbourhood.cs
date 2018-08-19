@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using Assets.Scripts.Core;
+using Assets.Scripts.Units;
 
 namespace Assets.Scripts.Movement
 {

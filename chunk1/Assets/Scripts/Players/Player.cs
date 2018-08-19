@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Assets.Scripts.Core;
 
-namespace Assets.Scripts.Player
+namespace Assets.Scripts.Players
 {
     public class Player
     {
@@ -13,6 +13,11 @@ namespace Assets.Scripts.Player
         public Player(Faction faction)
         {
             Faction = faction;
+        }
+
+        public bool IsEnemy()
+        {
+            return Faction == Faction.B;
         }
     }
 }

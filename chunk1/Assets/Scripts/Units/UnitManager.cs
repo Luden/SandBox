@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using Assets.Scripts;
-using Assets.Scripts.Commands;
 using Assets.Scripts.Core;
+using Assets.Scripts.Units;
 using UnityEngine;
 
 public class UnitManager : ManagerBase

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Assets.Scripts.Core;
 
-namespace Assets.Scripts.Player
+namespace Assets.Scripts.Players
 {
     public class PlayerManager : ManagerBase
     {

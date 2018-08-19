@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Assets.Scripts;
 using Assets.Scripts.Core;
+using Assets.Scripts.Units;
 using UnityEngine;
 
 public class SelectionManager : ManagerBase
@@ -9,12 +10,13 @@ public class SelectionManager : ManagerBase
     private UnitManager _unitsManager;
     private Camera _mainCamera;
 
-	public Action<List<ISelectable>, List<ISelectable>, List<ISelectable>> OnSelectionChange;
+    public Unit UnitUnderCursor { get; private set; }
+    public Action<List<Unit>, List<Unit>, List<Unit>> OnSelectionChange;
 
-	private List<ISelectable> _selectedUnits = new List<ISelectable>();
-	private List<ISelectable> _recentlySelectedUnits = new List<ISelectable>();
-	private List<ISelectable> _recentlyDeselectedUnits = new List<ISelectable>();
-
+	private List<Unit> _selectedUnits = new List<Unit>();
+	private List<Unit> _recentlySelectedUnits = new List<Unit>();
+	private List<Unit> _recentlyDeselectedUnits = new List<Unit>();
+    
     public override ManagerType ManagerType { get { return ManagerType.Selection; } }
 
     public override void Init()
@@ -27,27 +29,26 @@ public class SelectionManager : ManagerBase
     {
         foreach (var unit in _unitsManager.Units)
         {
-            var selectable = unit.Selectable;
-            var inRect = CheckInRect(screenPos1, screenPos2, selectable);
-            if (!selectable.Preselected && inRect)
-                selectable.Preselected = true;
-            else if (selectable.Preselected && !inRect)
-                selectable.Preselected = false;
+            var inRect = CheckInRect(screenPos1, screenPos2, unit);
+            if (!unit.Selectable.Preselected && inRect)
+                unit.Selectable.Preselected = true;
+            else if (unit.Selectable.Preselected && !inRect)
+                unit.Selectable.Preselected = false;
         }
     }
 
-    private bool CheckInRect(Vector3 screenPos1, Vector3 screenPos2, ISelectable selectable)
+    private bool CheckInRect(Vector3 screenPos1, Vector3 screenPos2, Unit unit)
     {
-        var unitScreenPos = _mainCamera.WorldToScreenPoint(selectable.Position);
-        return unitScreenPos.x + selectable.Radius > screenPos1.x && unitScreenPos.x - selectable.Radius < screenPos2.x
-            && unitScreenPos.y + selectable.Radius > screenPos1.y && unitScreenPos.y - selectable.Radius < screenPos2.y;
+        var unitScreenPos = _mainCamera.WorldToScreenPoint(unit.Navigation.Position);
+        return unitScreenPos.x + unit.Selectable.Radius > screenPos1.x && unitScreenPos.x - unit.Selectable.Radius < screenPos2.x
+            && unitScreenPos.y + unit.Selectable.Radius > screenPos1.y && unitScreenPos.y - unit.Selectable.Radius < screenPos2.y;
     }
 
     public void ProcessPreselection(Vector3 screenPos)
     {
-        var hoverUnit = GetUnitUnderCursor(screenPos);
+        UnitUnderCursor = GetUnitUnderCursor(screenPos);
         foreach (var unit in _unitsManager.Units)
-            unit.Selectable.Preselected = unit.Selectable == hoverUnit;
+            unit.Selectable.Preselected = unit == UnitUnderCursor;
     }
 
     public void ProcessSelection(Vector3 screenPos1, Vector3 screenPos2)
@@ -58,21 +59,20 @@ public class SelectionManager : ManagerBase
 
 		foreach (var unit in _unitsManager.Units)
         {
-            var selectable = unit.Selectable;
-            var inRect = CheckInRect(screenPos1, screenPos2, selectable);
-            if (!selectable.Selected && inRect)
+            var inRect = CheckInRect(screenPos1, screenPos2, unit);
+            if (!unit.Selectable.Selected && inRect)
 			{
-				_recentlySelectedUnits.Add(selectable);
-				selectable.Selected = true;
+				_recentlySelectedUnits.Add(unit);
+                unit.Selectable.Selected = true;
 			}
-			else if (selectable.Selected && !inRect)
+			else if (unit.Selectable.Selected && !inRect)
 			{
-				_recentlyDeselectedUnits.Add(selectable);
-				selectable.Selected = false;
+				_recentlyDeselectedUnits.Add(unit);
+                unit.Selectable.Selected = false;
 			}
 
-			if (selectable.Selected)
-				_selectedUnits.Add(selectable);
+			if (unit.Selectable.Selected)
+				_selectedUnits.Add(unit);
 		}
 
         ProcessAdditionalSingleSelection(screenPos1);
@@ -82,12 +82,12 @@ public class SelectionManager : ManagerBase
 			OnSelectionChange(_selectedUnits, _recentlySelectedUnits, _recentlyDeselectedUnits);
 	}
 
-	public ISelectable GetUnitUnderCursor(Vector3 screenPos)
+	public Unit GetUnitUnderCursor(Vector3 screenPos)
 	{
 		RaycastHit hit;
 		var ray = _mainCamera.ScreenPointToRay(screenPos);
 		if (Physics.Raycast(ray, out hit, 1000f, (1 << LayerMask.NameToLayer("Units"))))
-			return hit.transform.GetComponent<Selectable>();
+			return hit.transform.GetComponent<Unit>();
 		return null;
 	}
 
@@ -103,13 +103,13 @@ public class SelectionManager : ManagerBase
 
     public void ProcessAdditionalSingleSelection(Vector3 screenPos)
     {
-		var selectable = GetUnitUnderCursor(screenPos);
-		if (selectable != null && !selectable.Selected)
+		var unit = GetUnitUnderCursor(screenPos);
+		if (unit != null && !unit.Selectable.Selected)
 		{
-			selectable.Selected = true;
-			_selectedUnits.Add(selectable);
-			_recentlySelectedUnits.Add(selectable);
-			_recentlyDeselectedUnits.Remove(selectable);
+			unit.Selectable.Selected = true;
+			_selectedUnits.Add(unit);
+			_recentlySelectedUnits.Add(unit);
+			_recentlyDeselectedUnits.Remove(unit);
 		}
     }
 

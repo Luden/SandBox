@@ -33,33 +33,44 @@ namespace Assets.Scripts
 			return result;
 		}
 
-		public RegularUpdate StartUpdate(Action<float> update, float period)
+		public void StartUpdate(ref RegularUpdate task, Action<float> update, float period)
 		{
-			var task = GetOrCreate();
+            if (task != null)
+            {
+                if (task.Update == update)
+                    return;
+                StopUpdate(ref task);
+            }
+			task = GetOrCreate();
 			task.Update = update;
 			task.Period = period;
 			task.LastUpdate = Time.time;
             task.IsOnce = false;
             task.IsCancelled = false;
             _tasks.Add(task);
-			return task;
 		}
 
-        public RegularUpdate LateUpdateOnce(Action<float> update)
+        //public RegularUpdate LateUpdateOnce(Action<float> update)
+        //{
+        //    var task = StartUpdate(update, Time.fixedDeltaTime + Mathf.Epsilon);
+        //    task.IsOnce = true;
+        //    return task;
+        //}
+
+        public void StopUpdate(ref RegularUpdate update)
         {
-            var task = StartUpdate(update, Time.fixedDeltaTime + Mathf.Epsilon);
-            task.IsOnce = true;
-            return task;
+            StopUpdate(update);
+            update = null;
         }
 
-		public void StopUpdate(RegularUpdate update)
+        private void StopUpdate(RegularUpdate update)
 		{
             if (update == null)
                 return;
 
             update.IsCancelled = true;
             _taskToRemove.Add(update);
-		}
+        }
 
 		private void FixedUpdate()
 		{

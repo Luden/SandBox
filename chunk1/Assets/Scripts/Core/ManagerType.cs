@@ -10,6 +10,7 @@
         Unit,
         Command,
         Player,
-        Visibility
+        Visibility,
+        Shots
     }
 }

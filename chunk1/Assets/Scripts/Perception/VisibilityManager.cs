@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Assets.Scripts.Core;
 
-namespace Assets.Scripts.Visibility
+namespace Assets.Scripts.Perception
 {
     public class VisibilityManager : ManagerBase
     {

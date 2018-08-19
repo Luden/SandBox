@@ -1,15 +1,16 @@
 ﻿using Assets.Scripts;
+using Assets.Scripts.Units;
 using UnityEngine;
 
 public class SelectionView : MonoBehaviour
 {
     [SerializeField]
-    Selectable _selectable = null;
+    Unit _unit = null;
     MeshRenderer _visual;
 
     void Start()
     {
-        _selectable.OnSelectionChange += UpdateSelection;
+        _unit.Selectable.OnSelectionChange += UpdateSelection;
         _visual = GetComponent<MeshRenderer>();
         UpdateSelection(false);
     }
