@@ -7,36 +7,36 @@ using Assets.Scripts.Units;
 
 namespace Assets.Scripts.Movement
 {
-    public class Neighbourhood : MonoBehaviour
+    public class Neighbourhood
     {
-        private NavMeshAgent _navMeshAgent;
+        private IUnitObject _unitObject;
+        private UnitManager _unitManager;
 
-        private void Start()
+        public Neighbourhood(IUnitObject unitObject)
         {
-            _navMeshAgent = GetComponent<NavMeshAgent>();
+            _unitObject = unitObject;
+            _unitObject.OnColliderEnter += OnTriggerEnter;
         }
 
-        HashSet<Navigation> _neighbours = new HashSet<Navigation>();
+        HashSet<IUnitObject> _neighbours = new HashSet<IUnitObject>();
         GameObject _reachedTarget = null;
-        void OnTriggerEnter(Collider other)
+        void OnTriggerEnter(IUnitObject other)
         {
-            if (other.gameObject.tag == Tags.Unit)
-                _neighbours.Add(other.gameObject.GetComponent<Navigation>());
+            _neighbours.Add(other);
         }
 
-        void OnTriggerExit(Collider other)
+        void OnTriggerExit(IUnitObject other)
         {
-            if (other.gameObject.tag == Tags.Unit)
-                _neighbours.Remove(other.gameObject.GetComponent<Navigation>());
+            _neighbours.Remove(other);
         }
 
         int _visitorHash = -1;
-        List<Navigation> _cacheNeighbours = new List<Navigation>();
-        List<Navigation> GetNeighbours(bool isMoving)
+        List<IUnitObject> _cacheNeighbours = new List<IUnitObject>();
+        List<IUnitObject> GetNeighbours(bool isMoving)
         {
             _cacheNeighbours.Clear();
             foreach (var unit in _neighbours)
-                if (unit.IsMoving == isMoving)
+                if (unit.Owner.Navigation.IsMoving == isMoving)
                     _cacheNeighbours.Add(unit);
             return _cacheNeighbours;
         }
@@ -55,22 +55,22 @@ namespace Assets.Scripts.Movement
                 return false;
 
             foreach (var unit in staticNeighbours)
-                if (unit.IsUnitOrNeighboursReachedTarget(point, _visitorHash))
+                if (unit.Owner.Navigation.IsUnitOrNeighboursReachedTarget(point, _visitorHash))
                     return true;
 
             return false;
         }
 
-        public Navigation GetOppositeNeighbour()
+        public int GetOppositeNeighbourPriority()
         {
-            var direction = _navMeshAgent.steeringTarget - transform.position;
+            var direction = _unitObject.Owner.Navigation.SteeringTarget - _unitObject.Position;
             foreach (var unit in GetNeighbours(true))
             {
-                var unitDirection = unit.NavMeshAgent.steeringTarget - unit.transform.position;
+                var unitDirection = unit.Owner.Navigation.SteeringTarget - unit.Owner.Navigation.Position;
                 if (Vector3.Dot(unitDirection, direction) < 0.1f)
-                    return unit;
+                    return unit.NavMeshAgent.avoidancePriority;
             }
-            return null;
+            return -1;
         }
 
         private void RebuildHash()
@@ -86,7 +86,7 @@ namespace Assets.Scripts.Movement
 
             anyUnit.Navigation.Neighbourhood.RebuildHash();
             foreach (var unit in anyUnit.Navigation.Neighbourhood._neighbours)
-                unit.Neighbourhood.MarkNeighbours(anyUnit.Navigation.Neighbourhood._visitorHash);
+                unit.Owner.Navigation.Neighbourhood.MarkNeighbours(anyUnit.Navigation.Neighbourhood._visitorHash);
 
             foreach (var unit in units)
                 if (unit.Navigation.Neighbourhood._visitorHash != anyUnit.Navigation.Neighbourhood._visitorHash)
@@ -101,7 +101,7 @@ namespace Assets.Scripts.Movement
                 return;
             _visitorHash = visitorHash;
             foreach (var unit in _neighbours)
-                unit.Neighbourhood.MarkNeighbours(visitorHash);
+                unit.Owner.Navigation.Neighbourhood.MarkNeighbours(visitorHash);
         }
     }
 }

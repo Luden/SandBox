@@ -3,15 +3,16 @@ using UnityEngine;
 
 namespace Assets.Scripts.Input
 {
-    public class InputManager : ManagerBase
+    public class InputManager : MonoBehaviour, IManager
 	{
 		public SelectionRect SelectionRect;
 		public KeyInput KeyInput;
 
-        public override ManagerType ManagerType { get { return ManagerType.Input; } }
+        public ManagerType ManagerType { get { return ManagerType.Input; } }
 
-        public override void Init()
+        public void Init()
         {
+
         }
     }
 }

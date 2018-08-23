@@ -7,6 +7,7 @@ using Assets.Scripts.Players;
 using Assets.Scripts.Shots;
 using Assets.Scripts.Perception;
 using UnityEngine;
+using Assets.Scripts.Units;
 
 namespace Assets.Scripts
 {
@@ -14,7 +15,9 @@ namespace Assets.Scripts
 	{
 		public GameSettings GameSettings;
 		public UnitManager UnitManager;
-		public InputManager InputManager;
+        public UnitObjectManager UnitObjectManager;
+        public UnitViewManager UnitViewManager;
+        public InputManager InputManager;
 		public SelectionManager SelectionManager;
 		public CommandManager CommandManager;
 		public TimeManager TimeManager;
@@ -23,7 +26,7 @@ namespace Assets.Scripts
         public VisibilityManager VisibilityManager;
         public ShotsManager ShotsManager;
 
-        private Dictionary<ManagerType, ManagerBase> _managers = new Dictionary<ManagerType, ManagerBase>();
+        private Dictionary<ManagerType, IManager> _managers = new Dictionary<ManagerType, IManager>();
 
         protected override void Awake()
         {
@@ -31,15 +34,18 @@ namespace Assets.Scripts
 
             GameSettings = GameSettings.Instance;
 
-            UnitManager = GameObject.FindObjectOfType<UnitManager>();
+            UnitObjectManager = GameObject.FindObjectOfType<UnitObjectManager>();
+            UnitViewManager = GameObject.FindObjectOfType<UnitViewManager>();
             InputManager = GameObject.FindObjectOfType<InputManager>();
-            SelectionManager = GameObject.FindObjectOfType<SelectionManager>();
-            CommandManager = GameObject.FindObjectOfType<CommandManager>();
-            TimeManager = GameObject.FindObjectOfType<TimeManager>();
-            InputContextManager = GameObject.FindObjectOfType<InputContextManager>();
-            PlayerManager = GameObject.FindObjectOfType<PlayerManager>();
-            VisibilityManager = GameObject.FindObjectOfType<VisibilityManager>();
-            ShotsManager = GameObject.FindObjectOfType<ShotsManager>();
+
+            UnitManager = new UnitManager();
+            TimeManager = new TimeManager();
+            SelectionManager = new SelectionManager();
+            CommandManager = new CommandManager();
+            InputContextManager = new InputContextManager();
+            PlayerManager = new PlayerManager();
+            VisibilityManager = new VisibilityManager();
+            ShotsManager = new ShotsManager();
 
             _managers[UnitManager.ManagerType] = UnitManager;
             _managers[InputManager.ManagerType] = InputManager;
@@ -51,15 +57,10 @@ namespace Assets.Scripts
             _managers[VisibilityManager.ManagerType] = VisibilityManager;
             _managers[ShotsManager.ManagerType] = ShotsManager;
 
-            TimeManager.Init();
-            UnitManager.Init();
-            InputManager.Init();
-            SelectionManager.Init();
-            CommandManager.Init();
-            InputContextManager.Init();
-            PlayerManager.Init();
-            VisibilityManager.Init();
-            ShotsManager.Init();
+            foreach (var manager in _managers.Values)
+                manager.Init();
+
+            UnitManager.PostInit();
         }
 	}
 }

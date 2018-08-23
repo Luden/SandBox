@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Core;
@@ -15,13 +16,18 @@ namespace Assets.Scripts
         public bool IsCancelled;
     }
 
-	public class TimeManager : ManagerBase
+	public class TimeManager : IManager
 	{
 		private List<RegularUpdate> _tasks = new List<RegularUpdate>();
 		private List<RegularUpdate> _taskPool = new List<RegularUpdate>();
 		private List<RegularUpdate> _taskToRemove = new List<RegularUpdate>();
 
-        public override ManagerType ManagerType { get { return ManagerType.Time; } }
+        public ManagerType ManagerType { get { return ManagerType.Time; } }
+
+        public void Init()
+        {
+            ManagerProvider.Instance.StartCoroutine(Update());
+        }
 
         private RegularUpdate GetOrCreate()
 		{
@@ -72,7 +78,7 @@ namespace Assets.Scripts
             _taskToRemove.Add(update);
         }
 
-		private void FixedUpdate()
+		private IEnumerator Update()
 		{
 			float time = Time.time;
 
@@ -96,6 +102,8 @@ namespace Assets.Scripts
                         StopUpdate(task);
 				}
 			}
+
+            yield return null;
 		}
-	}
+    }
 }

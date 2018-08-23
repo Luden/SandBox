@@ -5,15 +5,17 @@ namespace Assets.Scripts.UI
 {
     public class TargetView : MonoBehaviour
     {
-        [SerializeField]
         private Unit _unit;
         private Unit _lastTarget;
         private TargetView _lastTargetView;
-
         private MeshRenderer _visual;
+        private UnitViewManager _unitViewManager;
 
-        void Start()
+        public void Init(Unit unit)
         {
+            _unit = unit;
+            _unitViewManager = ManagerProvider.Instance.UnitViewManager;
+
             _unit.Selectable.OnSelectionChange += UpdateTarget;
             _unit.Targeting.OnTargetChange += UpdateTarget;
 
@@ -35,7 +37,7 @@ namespace Assets.Scripts.UI
                 {
                     if (_lastTargetView != null)
                         _lastTargetView.SetTargeted(false);
-                    _lastTargetView = _lastTarget.GetComponentInChildren<TargetView>();
+                    _lastTargetView = _unitViewManager.Units[_lastTarget.Id].TargetView;
                 }
             }
 

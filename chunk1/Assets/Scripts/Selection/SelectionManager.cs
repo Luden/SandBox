@@ -5,21 +5,20 @@ using Assets.Scripts.Core;
 using Assets.Scripts.Units;
 using UnityEngine;
 
-public class SelectionManager : ManagerBase
+public class SelectionManager : IManager
 {
-    private UnitManager _unitsManager;
-    private Camera _mainCamera;
-
     public Unit UnitUnderCursor { get; private set; }
     public Action<List<Unit>, List<Unit>, List<Unit>> OnSelectionChange;
+    public IEnumerable<Unit> SelectedUnits { get { return _selectedUnits; } }
+    public ManagerType ManagerType { get { return ManagerType.Selection; } }
 
-	private List<Unit> _selectedUnits = new List<Unit>();
+    private UnitManager _unitsManager;
+    private Camera _mainCamera;
+    private List<Unit> _selectedUnits = new List<Unit>();
 	private List<Unit> _recentlySelectedUnits = new List<Unit>();
 	private List<Unit> _recentlyDeselectedUnits = new List<Unit>();
-    
-    public override ManagerType ManagerType { get { return ManagerType.Selection; } }
 
-    public override void Init()
+    public void Init()
 	{
         _mainCamera = Camera.main;
         _unitsManager = ManagerProvider.Instance.UnitManager;
@@ -117,4 +116,6 @@ public class SelectionManager : ManagerBase
 	{
 		return _selectedUnits.Count > 0;
 	}
+
+    
 }

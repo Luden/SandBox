@@ -4,15 +4,15 @@ using UnityEngine;
 
 namespace Assets.Scripts.InputContext
 {
-    public class InputContextManager : ManagerBase
+    public class InputContextManager : IManager
 	{
 		ManagerProvider _provider;
 
 		SortedDictionary<InputContextType, InputContextBase> _contexts;
 
-        public override ManagerType ManagerType { get { return ManagerType.InputContext; } }
+        public ManagerType ManagerType { get { return ManagerType.InputContext; } }
 
-        public override void Init()
+        public void Init()
 		{
             _provider = ManagerProvider.Instance;
             _contexts = new SortedDictionary<InputContextType, InputContextBase>();

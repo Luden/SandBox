@@ -2,44 +2,43 @@
 using Assets.Scripts;
 using Assets.Scripts.Commands;
 using Assets.Scripts.Movement;
+using Assets.Scripts.Units;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace Assets.Scripts.Movement
 {
-    public class Navigation : MonoBehaviour
+    public class Navigation
     {
-        public NavMeshAgent NavMeshAgent;
         public Neighbourhood Neighbourhood;
-
         public Action OnCancel;
         public Action OnFinish;
 
-        RegularUpdate _update;
-        TimeManager _timeManager;
+        public Vector3 Position { get { return _unitObject.Position; } }
+        public float Pitch { get { return _unitObject.Rotation.eulerAngles.y; } }
+        public Vector3 SteeringTarget { get { return _unitObject.NavMeshAgent.steeringTarget; } }
+        
+        private const int StopPriority = 50;
+        private const int MovePriority = 48;
+        private const int GiveWayPriority = 49;
+        private const float StopCheckSpeedPart = 0.1f;
+        private const float StopTime = 1f;
 
-        Vector3 _initialTarget;
-        Vector3 _navMeshTarget;
+        private IUnitObject _unitObject;
+        private RegularUpdate _update;
+        private TimeManager _timeManager;
+        private Vector3 _initialTarget;
+        private Vector3 _navMeshTarget;
 
-        const int StopPriority = 50;
-        const int MovePriority = 48;
-        const int GiveWayPriority = 49;
-        const float StopCheckSpeedPart = 0.1f;
-        const float StopTime = 1f;
+        private float _stopCheckSpeedSquared = 0f;
+        private bool _alreadyReachedTarget = false;
+        private float _lastDistanceToTarget = 0f;
 
-        float _stopCheckSpeedSquared = 0f;
-        bool _alreadyReachedTarget = false;
-        float _lastDistanceToTarget = 0f;
-
-        public Vector3 Position { get { return transform.position; } }
-        public float Pitch { get { return transform.rotation.eulerAngles.y; } }
-
-        public void Start()
+        public Navigation(IUnitObject unitObject)
         {
             var provider = ManagerProvider.Instance;
             _timeManager = provider.TimeManager;
-            NavMeshAgent = GetComponent<NavMeshAgent>();
-            Neighbourhood = GetComponent<Neighbourhood>();
+            Neighbourhood = new Neighbourhood(unitObject);
         }
 
         public void Go(Vector3 target)
@@ -57,9 +56,9 @@ namespace Assets.Scripts.Movement
 
             _navMeshTarget = hit.position;
 
-            NavMeshAgent.SetDestination(_navMeshTarget);
-            NavMeshAgent.avoidancePriority = MovePriority;
-            _stopCheckSpeedSquared = NavMeshAgent.speed * NavMeshAgent.speed * StopCheckSpeedPart;
+            _unitObject.NavMeshAgent.SetDestination(_navMeshTarget);
+            _unitObject.NavMeshAgent.avoidancePriority = MovePriority;
+            _stopCheckSpeedSquared = _unitObject.NavMeshAgent.speed * _unitObject.NavMeshAgent.speed * StopCheckSpeedPart;
             _timeManager.StartUpdate(ref _update, RegularUpdate, 0.1f);
         }
 
@@ -82,17 +81,17 @@ namespace Assets.Scripts.Movement
         public void Stop()
         {
             IsMoving = false;
-            if (NavMeshAgent.isOnNavMesh)
-                NavMeshAgent.ResetPath();
-            NavMeshAgent.avoidancePriority = StopPriority;
+            if (_unitObject.NavMeshAgent.isOnNavMesh)
+                _unitObject.NavMeshAgent.ResetPath();
+            _unitObject.NavMeshAgent.avoidancePriority = StopPriority;
             _timeManager.StopUpdate(ref _update);
         }
 
         public void RegularUpdate(float dt)
         {
-            if (!NavMeshAgent.enabled)
+            if (!_unitObject.NavMeshAgent.enabled)
                 return;
-            if (NavMeshAgent.pathPending)
+            if (_unitObject.NavMeshAgent.pathPending)
                 return;
 
             UpdatePathComplete();
@@ -103,7 +102,7 @@ namespace Assets.Scripts.Movement
 
         public bool IsUnitReachedTarget(Vector3 point)
         {
-            return (transform.position - point).sqrMagnitude < 1f;
+            return (_unitObject.Position - point).sqrMagnitude < 1f;
         }
 
         public bool IsUnitOrNeighboursReachedTarget(Vector3 point, int hash = -1)
@@ -113,9 +112,9 @@ namespace Assets.Scripts.Movement
 
         private void UpdatePathComplete()
         {
-            if (NavMeshAgent.remainingDistance <= NavMeshAgent.stoppingDistance)
+            if (_unitObject.NavMeshAgent.remainingDistance <= _unitObject.NavMeshAgent.stoppingDistance)
             {
-                if (!NavMeshAgent.hasPath || NavMeshAgent.velocity.sqrMagnitude == 0f)
+                if (!_unitObject.NavMeshAgent.hasPath || _unitObject.NavMeshAgent.velocity.sqrMagnitude == 0f)
                 {
                     Finish();
                 }
@@ -133,26 +132,25 @@ namespace Assets.Scripts.Movement
             if (!_alreadyReachedTarget && IsUnitReachedTarget(_navMeshTarget))
             {
                 _alreadyReachedTarget = true;
-                _lastDistanceToTarget = NavMeshAgent.remainingDistance;
+                _lastDistanceToTarget = _unitObject.NavMeshAgent.remainingDistance;
             }
 
-            if (_alreadyReachedTarget && NavMeshAgent.remainingDistance > _lastDistanceToTarget)
+            if (_alreadyReachedTarget && _unitObject.NavMeshAgent.remainingDistance > _lastDistanceToTarget)
                 Finish();
         }
 
         private void UpdateGiveWay()
         {
-            var opposer = Neighbourhood.GetOppositeNeighbour();
-            if (opposer != null)
+            var opposingPriority = Neighbourhood.GetOppositeNeighbourPriority();
+            if (opposingPriority != -1)
             {
-                if (NavMeshAgent.avoidancePriority != GiveWayPriority
-                    && opposer.NavMeshAgent.avoidancePriority != GiveWayPriority)
-                    NavMeshAgent.avoidancePriority = GiveWayPriority;
+                if (_unitObject.NavMeshAgent.avoidancePriority != GiveWayPriority && opposingPriority != GiveWayPriority)
+                    _unitObject.NavMeshAgent.avoidancePriority = GiveWayPriority;
             }
             else
             {
-                if (NavMeshAgent.avoidancePriority == GiveWayPriority)
-                    NavMeshAgent.avoidancePriority = MovePriority;
+                if (_unitObject.NavMeshAgent.avoidancePriority == GiveWayPriority)
+                    _unitObject.NavMeshAgent.avoidancePriority = MovePriority;
             }
         }
     }

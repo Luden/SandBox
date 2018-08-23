@@ -8,15 +8,15 @@ using UnityEngine;
 
 namespace Assets.Scripts.Shots
 {
-    public class ShotsManager : ManagerBase
+    public class ShotsManager : IManager
     {
-        public override ManagerType ManagerType { get { return ManagerType.Shots; } }
+        public ManagerType ManagerType { get { return ManagerType.Shots; } }
 
         private TimeManager _timeManager;
         private RegularUpdate _update;
         private List<Shot> _shots;
 
-        public override void Init()
+        public void Init()
         {
             _timeManager = ManagerProvider.Instance.TimeManager;
             _timeManager.StartUpdate(ref _update, RegularUpdate, 0.1f);

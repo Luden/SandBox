@@ -6,10 +6,12 @@ using Assets.Scripts.Core;
 
 namespace Assets.Scripts.Perception
 {
-    public class VisibilityManager : ManagerBase
+    public class VisibilityManager : IManager
     {
-        public override ManagerType ManagerType { get { return ManagerType.Visibility; } }
+        public ManagerType ManagerType { get { return ManagerType.Visibility; } }
 
-
+        public void Init()
+        {
+        }
     }
 }

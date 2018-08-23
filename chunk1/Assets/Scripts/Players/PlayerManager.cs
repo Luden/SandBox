@@ -6,17 +6,17 @@ using Assets.Scripts.Core;
 
 namespace Assets.Scripts.Players
 {
-    public class PlayerManager : ManagerBase
+    public class PlayerManager : IManager
     {
         public List<Player> Players;
 
-        public override ManagerType ManagerType { get { return ManagerType.Player; } }
+        public ManagerType ManagerType { get { return ManagerType.Player; } }
 
         public Player Neutral;
         public Player Enemy;
         public Player MyPlayer;
 
-        public override void Init()
+        public void Init()
         {
             Neutral = new Player(Faction.N);
             Enemy = new Player(Faction.B);

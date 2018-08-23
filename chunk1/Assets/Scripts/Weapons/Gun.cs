@@ -1,12 +1,14 @@
-﻿using Assets.Scripts.Movement;
+﻿using Assets.Scripts.Parts;
+using Assets.Scripts.Movement;
 using Assets.Scripts.Shots;
 using Assets.Scripts.Units;
 using UnityEngine;
 
 namespace Assets.Scripts.Weapons
 {
-    public class Gun
+    public class Gun : Part
     {
+        public override PartType Type { get { return PartType.None; } }
         public float Range = 10f;
 
         private TimeManager _timeManager;

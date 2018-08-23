@@ -8,6 +8,8 @@
         InputContext,
         Selection,
         Unit,
+        UnitObject,
+        UnitView,
         Command,
         Player,
         Visibility,

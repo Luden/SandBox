@@ -7,32 +7,32 @@ using Assets.Scripts.Units;
 
 namespace Assets.Scripts.Commands
 {
-    public class CommandManager : ManagerBase
+    public class CommandManager : IManager
 	{
 		public CommandFactory CommandFactory { get; private set; }
         public FormationFactory FormationFactory { get; private set; }
+        public ManagerType ManagerType { get { return ManagerType.Command; } }
 
         private UnitManager _unitsManager;
-
+        private SelectionManager _selectionManager;
         private List<Unit> _units = new List<Unit>();
 
-        public override ManagerType ManagerType { get { return ManagerType.Command; } }
-
-        public override void Init()
+        public void Init()
 		{
 			_unitsManager = ManagerProvider.Instance.UnitManager;
-			CommandFactory = new CommandFactory(ManagerProvider.Instance.TimeManager);
+            _selectionManager = ManagerProvider.Instance.SelectionManager;
+            CommandFactory = new CommandFactory(ManagerProvider.Instance.TimeManager);
             FormationFactory = new FormationFactory();
         }
 
         public void Send(CommandType commandType, Vector3 targetPos, Unit targetUnit, bool queue)
 		{
             _units.Clear();
-            _units.AddRange(_unitsManager.Units.Where(unit => unit.Selectable.Selected));
+            _units.AddRange(_selectionManager.SelectedUnits);
 
             var formation = FormationFactory.GetOrCreate(
                 FormationSelector.GetFormationType(_units, targetPos, commandType));
-            formation.Init(_units.Select(x => x.transform.position), targetPos);
+            formation.Init(_units.Select(x => x.Navigation.Position), targetPos);
 
             int index = 0;
             foreach (var unit in _units)
