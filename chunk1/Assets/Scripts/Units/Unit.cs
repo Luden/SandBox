@@ -23,8 +23,7 @@ namespace Assets.Scripts.Units
         public Targeting Targeting;
         public Arsenal Arsenal;
         public Hull Hull;
-
-        public List<Part> Parts = new List<Part>();
+        public Partset Partset;
 
         public Unit(int id, IUnitObject unitObject, Faction startingFaction)
         {
@@ -34,10 +33,11 @@ namespace Assets.Scripts.Units
             var provider = ManagerProvider.Instance;
             Player = provider.PlayerManager.GetPlayer(startingFaction);
             CommandProcessor = new CommandProcessor(provider.CommandManager.CommandFactory, provider.TimeManager, provider.GameSettings.UnitCommandsUpdatePeriod, this);
+            Partset = new Partset();
             Navigation = new Navigation(UnitObject);
             Following = new Following(Navigation, provider.TimeManager);
             Targeting = new Targeting(Navigation, Player.Faction);
-            Arsenal = new Arsenal(Navigation, Targeting, Following, provider.ShotsManager, provider.TimeManager);
+            Arsenal = new Arsenal(Navigation, Targeting, Following, Partset, provider.ShotsManager, provider.TimeManager);
             Selectable = new Selectable();
             Visibility = new Visibility(Player.Faction);
             Hull = new Hull();

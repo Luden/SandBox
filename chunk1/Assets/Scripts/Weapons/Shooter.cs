@@ -55,5 +55,10 @@ namespace Assets.Scripts.Weapons
             if (OnShootingFinished != null)
                 OnShootingFinished();
         }
+
+        public void Stop()
+        {
+            _timeManager.StopUpdate(ref _update);
+        }
     }
 }

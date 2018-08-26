@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Assets.Scripts;
 using Assets.Scripts.Core;
+using Assets.Scripts.Parts;
 using Assets.Scripts.Units;
 using UnityEngine;
 
@@ -14,25 +15,31 @@ public class UnitManager : IManager
     public Action<Unit> OnUnitCreated;
 
     private UnitObjectManager _unitObjectManager;
+    private PartsManager _partsManager;
     private Dictionary<int, Unit> _units = new Dictionary<int, Unit>();
 
     public void Init()
     {
         _unitObjectManager = ManagerProvider.Instance.UnitObjectManager;
+        _partsManager = ManagerProvider.Instance.PartsManager;
     }
 
-    public void PostInit()
+    public void AddUnit()
     {
-        var unitObjects = _unitObjectManager.GetInitialUnits();
-        foreach (var unit in unitObjects)
-            AddUnit(unit);
+        var unitObject = _unitObjectManager.CreateUnitObject();
+        AddUnit(unitObject, new Dictionary<int, PartType>());
     }
 
-    private void AddUnit(IUnitObject unitObject)
+    public void AddUnit(IUnitObject unitObject, Dictionary<int, PartType> parts)
     {
         var unit = new Unit(++_lastID, unitObject, Faction.N);
+
+        foreach (var pair in parts)
+            unit.Partset.AttachPart(pair.Key, _partsManager.CreatePart(pair.Value));
+
         Units[_lastID] = unit;
         Units.Add(unit);
+
         if (OnUnitCreated != null)
             OnUnitCreated(unit);
     }

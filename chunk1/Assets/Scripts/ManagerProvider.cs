@@ -8,6 +8,7 @@ using Assets.Scripts.Shots;
 using Assets.Scripts.Perception;
 using UnityEngine;
 using Assets.Scripts.Units;
+using Assets.Scripts.Parts;
 
 namespace Assets.Scripts
 {
@@ -17,6 +18,8 @@ namespace Assets.Scripts
 		public UnitManager UnitManager;
         public UnitObjectManager UnitObjectManager;
         public UnitViewManager UnitViewManager;
+        public PartsManager PartsManager;
+        public PartViewsManager PartViewsManager;
         public InputManager InputManager;
 		public SelectionManager SelectionManager;
 		public CommandManager CommandManager;
@@ -37,8 +40,10 @@ namespace Assets.Scripts
             UnitObjectManager = GameObject.FindObjectOfType<UnitObjectManager>();
             UnitViewManager = GameObject.FindObjectOfType<UnitViewManager>();
             InputManager = GameObject.FindObjectOfType<InputManager>();
+            PartViewsManager = GameObject.FindObjectOfType<PartViewsManager>();
 
             UnitManager = new UnitManager();
+            PartsManager = new PartsManager();
             TimeManager = new TimeManager();
             SelectionManager = new SelectionManager();
             CommandManager = new CommandManager();
@@ -56,11 +61,11 @@ namespace Assets.Scripts
             _managers[PlayerManager.ManagerType] = PlayerManager;
             _managers[VisibilityManager.ManagerType] = VisibilityManager;
             _managers[ShotsManager.ManagerType] = ShotsManager;
+            _managers[PartsManager.ManagerType] = PartsManager;
+            _managers[PartViewsManager.ManagerType] = PartViewsManager;
 
             foreach (var manager in _managers.Values)
                 manager.Init();
-
-            UnitManager.PostInit();
         }
 	}
 }

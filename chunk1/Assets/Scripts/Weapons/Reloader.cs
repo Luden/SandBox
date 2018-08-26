@@ -42,5 +42,11 @@ namespace Assets.Scripts.Weapons
             if (OnReloadingFinish != null)
                 OnReloadingFinish();
         }
+
+        public void Stop()
+        {
+            _timeManager.StopUpdate(ref _update);
+            ReloadRemainingTime = 0f;
+        }
     }
 }

@@ -20,7 +20,7 @@ namespace Assets.Scripts.Weapons
         private ShotsManager _shotsManager;
         private Vector3 _targetPosition;
 
-        public Gun(Targeting targeting, Navigation navigation, ShotsManager shotsManager, TimeManager timeManager)
+        public void Init(Targeting targeting, Navigation navigation, ShotsManager shotsManager, TimeManager timeManager)
         {
             _navigation = navigation;
             _targeting = targeting;
@@ -105,6 +105,13 @@ namespace Assets.Scripts.Weapons
                 return false;
 
             return true;
+        }
+
+        public void Stop()
+        {
+            _reloader.Stop();
+            _aimer.Stop();
+            _shooter.Stop();
         }
     }
 }

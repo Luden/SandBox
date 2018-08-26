@@ -13,6 +13,8 @@
         Command,
         Player,
         Visibility,
-        Shots
+        Shots,
+        Parts,
+        PartViews
     }
 }

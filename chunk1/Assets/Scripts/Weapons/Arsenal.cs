@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Assets.Scripts.Movement;
+using Assets.Scripts.Parts;
 using Assets.Scripts.Shots;
 using Assets.Scripts.Units;
 
@@ -13,19 +14,49 @@ namespace Assets.Scripts.Weapons
         private RegularUpdate _update;
         private Targeting _targeting;
         private Following _following;
+        private Partset _partset;
 
         public List<Gun> Guns = new List<Gun>();
 
-        public Arsenal(Navigation navigation, Targeting targeting, Following following, ShotsManager shotsManager, TimeManager timeManager)
+        public Arsenal(Navigation navigation, Targeting targeting, Following following, Partset partset, ShotsManager shotsManager, TimeManager timeManager)
         {
             _shotsManager = shotsManager;
             _timeManager = timeManager;
             _targeting = targeting;
             _navigation = navigation;
             _following = following;
+            _partset = partset;
 
-            Guns.Add(new Gun(_targeting, _navigation, _shotsManager, _timeManager));
+            _partset.OnPartAttached += OnPartAttached;
+            _partset.OnPartDetached += OnPartDetached;
+
             _targeting.OnTargetChange += OnTargetChange;
+        }
+
+        private void OnPartAttached(Part part, int slot)
+        {
+            if (part.Type != PartType.Gun)
+                return;
+
+            var gun = part as Gun;
+            if (gun == null || Guns.Contains(gun))
+                return;
+
+            gun.Init(_targeting, _navigation, _shotsManager, _timeManager);
+            Guns.Add(gun);
+        }
+
+        private void OnPartDetached(Part part, int slot)
+        {
+            if (part.Type != PartType.Gun)
+                return;
+
+            var gun = part as Gun;
+            if (gun == null || !Guns.Contains(gun))
+                return;
+
+            gun.Stop();
+            Guns.Remove(gun);
         }
 
         private void OnTargetChange(Unit unit)
@@ -63,6 +94,8 @@ namespace Assets.Scripts.Weapons
         public void Stop()
         {
             _timeManager.StopUpdate(ref _update);
+            foreach (var gun in Guns)
+                gun.Stop();
         }
     }
 }

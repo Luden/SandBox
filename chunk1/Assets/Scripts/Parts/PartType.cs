@@ -3,5 +3,6 @@
     public enum PartType
     {
         None,
+        Gun
     }
 }
