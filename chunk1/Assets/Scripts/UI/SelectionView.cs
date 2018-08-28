@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class SelectionView : MonoBehaviour
 {
-    [SerializeField]
     Unit _unit = null;
     MeshRenderer _visual;
 
-    void Start()
+    public void Init(Unit unit)
     {
+        _unit = unit;
         _unit.Selectable.OnSelectionChange += UpdateSelection;
         _visual = GetComponent<MeshRenderer>();
         UpdateSelection(false);

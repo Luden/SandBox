@@ -30,16 +30,6 @@ namespace Assets.Scripts.Weapons
             return target.Player.Faction != _faction;
         }
 
-        public bool CanAttack()
-        {
-            return false;
-        }
-
-        public bool IsTargetInRange()
-        {
-            return false;
-        }
-
         private void CallTargetChange()
         {
             if (OnTargetChange != null)

@@ -3,22 +3,25 @@ using Assets.Scripts.Movement;
 using Assets.Scripts.Shots;
 using Assets.Scripts.Units;
 using UnityEngine;
+using System;
 
 namespace Assets.Scripts.Weapons
 {
     public class Gun : Part
     {
+        public Vector3 BarrelOffset;
         public override PartType Type { get { return PartType.None; } }
         public float Range = 10f;
 
         private TimeManager _timeManager;
         private Navigation _navigation;
         private Targeting _targeting;
-        private Reloader _reloader;
-        private Shooter _shooter;
-        private Aimer _aimer;
         private ShotsManager _shotsManager;
         private Vector3 _targetPosition;
+
+        public Reloader Reloader { get; private set; }
+        public Shooter Shooter { get; private set; }
+        public Aimer Aimer { get; private set; }
 
         public void Init(Targeting targeting, Navigation navigation, ShotsManager shotsManager, TimeManager timeManager)
         {
@@ -26,37 +29,37 @@ namespace Assets.Scripts.Weapons
             _targeting = targeting;
             _timeManager = timeManager;
             _shotsManager = shotsManager;
-            _reloader = new Reloader(timeManager);
-            _shooter = new Shooter(timeManager);
-            _aimer = new Aimer(_navigation, _targeting, _timeManager);
+            Reloader = new Reloader(timeManager);
+            Shooter = new Shooter(timeManager);
+            Aimer = new Aimer(_navigation, _targeting, _timeManager);
 
-            _reloader.OnReloadingFinish += OnReloadingFinish;
-            _shooter.OnShootingFinished += OnShootingFinished;
-            _aimer.OnAimingFinished += OnAimingFinished;
-            _shooter.OnShoot += OnShoot;
+            Reloader.OnReloadingFinish += OnReloadingFinish;
+            Shooter.OnShootingFinished += OnShootingFinished;
+            Aimer.OnAimingFinished += OnAimingFinished;
+            Shooter.OnShoot += OnShoot;
         }
 
         private void OnReloadingFinish()
         {
             if (!IsTargetValid())
                 return;
-            if (_aimer.Check())
+            if (Aimer.Check())
                 StartShooting();
         }
 
         private void OnShootingFinished()
         {
-            _reloader.StartReloading();
+            Reloader.StartReloading();
 
             if (!IsTargetValid())
                 return;
 
-            _aimer.Check();
+            Aimer.Check();
         }
 
         public void CheckAiming()
         {
-            _aimer.Check();
+            Aimer.Check();
         }
 
         private void OnAimingFinished()
@@ -64,21 +67,22 @@ namespace Assets.Scripts.Weapons
             if (!IsTargetValid())
                 return;
 
-            if (!_reloader.IsReloading)
+            if (!Reloader.IsReloading)
                 StartShooting();
         }
 
         private void OnShoot()
         {
-            _shotsManager.AddShot(new Shot(_navigation.Position, _targetPosition));
+            var worldOffset = Quaternion.AngleAxis(Aimer.Pitch, Vector3.up) * BarrelOffset;
+            _shotsManager.AddShot(_navigation.Position + worldOffset, _targetPosition);
         }
 
         public void StartShooting()
         {
-            if (!_shooter.IsShooting)
+            if (!Shooter.IsShooting)
             {
                 _targetPosition = _targeting.CurrentTarget.Navigation.Position;
-                _shooter.StartShooting();
+                Shooter.StartShooting();
             }
         }
 
@@ -87,7 +91,7 @@ namespace Assets.Scripts.Weapons
             if (!CheckTarget(_targeting.CurrentTarget))
                 return false;
 
-            return !_shooter.IsShooting && !_reloader.IsReloading && !_aimer.IsAimed;
+            return !Shooter.IsShooting && !Reloader.IsReloading && !Aimer.IsAimed;
         }
 
         private bool IsTargetValid()
@@ -109,9 +113,9 @@ namespace Assets.Scripts.Weapons
 
         public void Stop()
         {
-            _reloader.Stop();
-            _aimer.Stop();
-            _shooter.Stop();
+            Reloader.Stop();
+            Aimer.Stop();
+            Shooter.Stop();
         }
     }
 }

@@ -78,11 +78,16 @@ namespace Assets.Scripts
             _taskToRemove.Add(update);
         }
 
+        public float GetTime()
+        {
+            return Time.time;
+        }
+
 		private IEnumerator Update()
 		{
-			float time = Time.time;
+            float time = GetTime();
 
-			if (_taskToRemove.Count > 0)
+            if (_taskToRemove.Count > 0)
 			{
 				foreach (var task in _taskToRemove)
 				{

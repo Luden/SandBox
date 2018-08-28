@@ -3,13 +3,13 @@ using UnityEngine;
 
 public class PreselectionView : MonoBehaviour
 {
-    [SerializeField]
-    Unit _unit = null;
+    Unit _unit;
     MeshRenderer _visual;
     Animation _animation;
 
-    void Start()
+    public void Init(Unit unit)
     {
+        _unit = unit;
         _unit.Selectable.OnPreselectionChange += UpdatePreselection;
         _visual = GetComponent<MeshRenderer>();
         _animation = GetComponent<Animation>();

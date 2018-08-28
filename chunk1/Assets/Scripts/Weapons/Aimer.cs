@@ -23,6 +23,8 @@ namespace Assets.Scripts.Weapons
         private TimeManager _timeManager;
         private RegularUpdate _update;
 
+        private float _lastUpdateTime;
+
         public Aimer(Navigation navigation, Targeting targeting, TimeManager timeManager)
         {
             _navigation = navigation;
@@ -30,12 +32,23 @@ namespace Assets.Scripts.Weapons
             _targeting = targeting;
         }
 
-        private void Update(float dt)
+        public float GetPitch(float time)
+        {
+            return GetPitchDelta(time - _lastUpdateTime);
+        }
+
+        private float GetPitchDelta(float dt)
         {
             var remaining = Euler.Diff(TargetPitch, TotalPitch);
             var sign = Math.Sign(remaining);
             var delta = Math.Min(AimingSpeed * dt, Mathf.Abs(remaining));
-            Pitch = (Pitch + delta * sign).Clamp360();
+            return (Pitch + delta * sign).Clamp360();
+        }
+
+        private void Update(float dt)
+        {
+            Pitch = GetPitchDelta(dt);
+            _lastUpdateTime = _timeManager.GetTime();
 
             if (!IsAimed)
                 CompleteAiming();

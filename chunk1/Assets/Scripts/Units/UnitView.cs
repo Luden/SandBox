@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Assets.Scripts.Parts;
 using Assets.Scripts.UI;
 using UnityEngine;
@@ -7,8 +8,8 @@ namespace Assets.Scripts.Units
 {
     public class UnitView : MonoBehaviour
     {
-        public int Id;
-        public TargetView TargetView;
+        [NonSerialized] public int Id;
+        [NonSerialized] public TargetView TargetView;
         public Dictionary<int, SlotView> Slots = new Dictionary<int, SlotView>();
 
         private Unit _unit;
@@ -34,7 +35,6 @@ namespace Assets.Scripts.Units
             _unit.Partset.OnPartDetached += OnPartDetached;
 
             TargetView = GetComponentInChildren<TargetView>();
-            TargetView.Init(_unit);
         }
 
         public Dictionary<int, PartType> GetInstalledParts()

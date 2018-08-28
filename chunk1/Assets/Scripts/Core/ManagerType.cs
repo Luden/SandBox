@@ -14,6 +14,7 @@
         Player,
         Visibility,
         Shots,
+        ShotViews,
         Parts,
         PartViews
     }

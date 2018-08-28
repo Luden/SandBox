@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Assets.Scripts.Core;
 using Assets.Scripts.Units;
+using Assets.Scripts.Weapons;
 using UnityEngine;
 
 namespace Assets.Scripts.Shots
 {
     public class ShotsManager : IManager
     {
+        public Action<Shot> OnShotCreated;
+        public Action<Shot> OnShotRemoved;
+
         public ManagerType ManagerType { get { return ManagerType.Shots; } }
 
         private TimeManager _timeManager;
@@ -22,8 +24,11 @@ namespace Assets.Scripts.Shots
             _timeManager.StartUpdate(ref _update, RegularUpdate, 0.1f);
         }
 
-        public void AddShot(Shot shot)
+        public void AddShot(Vector3 start, Vector3 finish)
         {
+            var shot = new Shot(start, finish, _timeManager.GetTime());
+            if (OnShotCreated != null)
+                OnShotCreated(shot);
             _shots.Add(shot);
         }
 
@@ -42,8 +47,11 @@ namespace Assets.Scripts.Shots
                     var unit = hit.transform.GetComponent<Unit>();
                     if (unit != null)
                         unit.Hull.ApplyShot(shot);
-
+                    
                     FastRemove(i--);
+
+                    if (OnShotRemoved != null)
+                        OnShotRemoved(shot);
                 }
             }
         }

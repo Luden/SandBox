@@ -13,8 +13,11 @@ namespace Assets.Scripts.Shots
         public float Damage;
         public float Velocity;
 
-        public Shot(Vector3 position, Vector3 targetPosition)
+        private float _time;
+
+        public Shot(Vector3 position, Vector3 targetPosition, float time)
         {
+            _time = time;
             Position = position;
             StartPosition = Position;
             TargetPosition = targetPosition;
@@ -23,8 +26,19 @@ namespace Assets.Scripts.Shots
 
         public void Update(float dt)
         {
+            _time += dt;
             OldPosition = Position;
-            Position = Position + Direction * Velocity * dt;
+            Position = GetPosition(dt);
+        }
+
+        public Vector3 GetPosition(float time)
+        {
+            return GetPositionDelta(time - _time);
+        }
+
+        public Vector3 GetPositionDelta(float dt)
+        {
+            return Position + Direction * Velocity * dt;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Assets.Scripts.Commands;
 using Assets.Scripts.Core;
 using Assets.Scripts.Input;
@@ -14,13 +15,15 @@ namespace Assets.Scripts
 {
     public class ManagerProvider : SingletonMonoBehaviour<ManagerProvider>
 	{
-		public GameSettings GameSettings;
+        [NonSerialized] public UnitObjectManager UnitObjectManager;
+        [NonSerialized] public UnitViewManager UnitViewManager;
+        [NonSerialized] public PartViewsManager PartViewsManager;
+        [NonSerialized] public ShotViewsManager ShotViewsManager;
+        [NonSerialized] public InputManager InputManager;
+
+        public GameSettings GameSettings;
 		public UnitManager UnitManager;
-        public UnitObjectManager UnitObjectManager;
-        public UnitViewManager UnitViewManager;
         public PartsManager PartsManager;
-        public PartViewsManager PartViewsManager;
-        public InputManager InputManager;
 		public SelectionManager SelectionManager;
 		public CommandManager CommandManager;
 		public TimeManager TimeManager;
@@ -41,6 +44,7 @@ namespace Assets.Scripts
             UnitViewManager = GameObject.FindObjectOfType<UnitViewManager>();
             InputManager = GameObject.FindObjectOfType<InputManager>();
             PartViewsManager = GameObject.FindObjectOfType<PartViewsManager>();
+            ShotViewsManager = GameObject.FindObjectOfType<ShotViewsManager>();
 
             UnitManager = new UnitManager();
             PartsManager = new PartsManager();
@@ -61,6 +65,7 @@ namespace Assets.Scripts
             _managers[PlayerManager.ManagerType] = PlayerManager;
             _managers[VisibilityManager.ManagerType] = VisibilityManager;
             _managers[ShotsManager.ManagerType] = ShotsManager;
+            _managers[ShotViewsManager.ManagerType] = ShotViewsManager;
             _managers[PartsManager.ManagerType] = PartsManager;
             _managers[PartViewsManager.ManagerType] = PartViewsManager;
 

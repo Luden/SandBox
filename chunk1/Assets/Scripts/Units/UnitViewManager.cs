@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Assets.Scripts.Core;
+using Assets.Scripts.UI;
 using UnityEngine;
 
 namespace Assets.Scripts.Units
@@ -13,6 +14,10 @@ namespace Assets.Scripts.Units
         private TimeManager _timeManager;
         private RegularUpdate _updateAddedViews;
         private List<UnitView> _viewsToProcess = new List<UnitView>();
+
+        [SerializeField] private SelectionView _selectionPrefab;
+        [SerializeField] private PreselectionView _preselectionPrefab;
+        [SerializeField] private TargetView _targetViewPrefab;
 
         public void Init()
         {
@@ -45,7 +50,18 @@ namespace Assets.Scripts.Units
         {
             var unitObject = unit.UnitObject;
             var view = (unitObject as UnitObject).GetComponent<UnitView>();
+
+            var selection = Instantiate<SelectionView>(_selectionPrefab, view.transform);
+            selection.Init(unit);
+
+            var preselection = Instantiate<PreselectionView>(_preselectionPrefab, view.transform);
+            preselection.Init(unit);
+
+            var target = Instantiate<TargetView>(_targetViewPrefab, view.transform);
+            target.Init(unit);
+
             view.Init(unit);
+
             Units[unit.Id] = view;
         }
     }
