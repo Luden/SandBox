@@ -12,6 +12,7 @@ namespace Assets.Scripts.Units
         Quaternion Rotation { get; }
         Action<IUnitObject> OnColliderEnter { get; set; }
         Action<IUnitObject> OnColliderExit { get; set; }
+        void Init(Unit unit);
         Unit Owner { get; } // cyclic refs for the win! because fuck you thats why
     }
 

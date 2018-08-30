@@ -16,7 +16,7 @@ namespace Assets.Scripts.Shots
 
         private TimeManager _timeManager;
         private RegularUpdate _update;
-        private List<Shot> _shots;
+        private List<Shot> _shots = new List<Shot>();
 
         public void Init()
         {

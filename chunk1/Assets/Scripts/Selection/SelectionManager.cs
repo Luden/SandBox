@@ -86,7 +86,7 @@ public class SelectionManager : IManager
 		RaycastHit hit;
 		var ray = _mainCamera.ScreenPointToRay(screenPos);
 		if (Physics.Raycast(ray, out hit, 1000f, (1 << LayerMask.NameToLayer("Units"))))
-			return hit.transform.GetComponent<Unit>();
+			return hit.transform.GetComponent<UnitObject>().Owner;
 		return null;
 	}
 

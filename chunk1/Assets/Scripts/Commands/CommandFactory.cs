@@ -6,13 +6,8 @@ namespace Assets.Scripts.Commands
 {
     public class CommandFactory : Pool<CommandType, CommandBase>
     {
-		private Dictionary<CommandType, List<CommandBase>> _commandPool = new Dictionary<CommandType, List<CommandBase>>();
-
-        private TimeManager _timeManager;
-
         public CommandFactory(TimeManager timeManager) : base()
         {
-            _timeManager = timeManager;
         }
 
         protected override CommandBase Create(CommandType commandType)

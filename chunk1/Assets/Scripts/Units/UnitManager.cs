@@ -16,7 +16,7 @@ public class UnitManager : IManager
 
     private UnitObjectManager _unitObjectManager;
     private PartsManager _partsManager;
-    private Dictionary<int, Unit> _units = new Dictionary<int, Unit>();
+    //private Dictionary<int, Unit> _units = new Dictionary<int, Unit>();
 
     public void Init()
     {
@@ -27,17 +27,18 @@ public class UnitManager : IManager
     public void AddUnit()
     {
         var unitObject = _unitObjectManager.CreateUnitObject();
-        AddUnit(unitObject, new Dictionary<int, PartType>());
+        AddUnit(unitObject);
     }
 
-    public void AddUnit(IUnitObject unitObject, Dictionary<int, PartType> parts)
+    public void AddUnit(IUnitObject unitObject, Dictionary<int, PartType> parts = null)
     {
         var unit = new Unit(++_lastID, unitObject, Faction.N);
+        unitObject.Init(unit);
 
-        foreach (var pair in parts)
-            unit.Partset.AttachPart(pair.Key, _partsManager.CreatePart(pair.Value));
+        if (parts != null)
+            foreach (var pair in parts)
+                unit.Partset.AttachPart(pair.Key, _partsManager.CreatePart(pair.Value));
 
-        Units[_lastID] = unit;
         Units.Add(unit);
 
         if (OnUnitCreated != null)

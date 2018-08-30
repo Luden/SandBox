@@ -10,12 +10,10 @@ namespace Assets.Scripts.Weapons
         public Action<Unit> OnTargetChange;
 
         public Unit CurrentTarget { get; private set; }
-        private Navigation _navigation;
         private Faction _faction;
 
         public Targeting(Navigation navigation, Faction faction)
         {
-            _navigation = navigation;
             _faction = faction;
         }
 

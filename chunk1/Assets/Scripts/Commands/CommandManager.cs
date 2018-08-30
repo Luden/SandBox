@@ -13,13 +13,11 @@ namespace Assets.Scripts.Commands
         public FormationFactory FormationFactory { get; private set; }
         public ManagerType ManagerType { get { return ManagerType.Command; } }
 
-        private UnitManager _unitsManager;
         private SelectionManager _selectionManager;
         private List<Unit> _units = new List<Unit>();
 
         public void Init()
 		{
-			_unitsManager = ManagerProvider.Instance.UnitManager;
             _selectionManager = ManagerProvider.Instance.SelectionManager;
             CommandFactory = new CommandFactory(ManagerProvider.Instance.TimeManager);
             FormationFactory = new FormationFactory();

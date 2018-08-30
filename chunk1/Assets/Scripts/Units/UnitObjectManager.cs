@@ -22,10 +22,5 @@ namespace Assets.Scripts.Units
             var unitObject = GameObject.Instantiate<UnitObject>(prefab, gameObject.transform);
             return unitObject;
         }
-
-        public IUnitObject[] GetInitialUnits()
-        {
-            return GameObject.FindObjectsOfType<UnitObject>();
-        }
     }
 }

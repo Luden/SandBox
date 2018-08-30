@@ -10,7 +10,6 @@ namespace Assets.Scripts.Movement
     public class Neighbourhood
     {
         private IUnitObject _unitObject;
-        private UnitManager _unitManager;
 
         public Neighbourhood(IUnitObject unitObject)
         {
@@ -19,7 +18,6 @@ namespace Assets.Scripts.Movement
         }
 
         HashSet<IUnitObject> _neighbours = new HashSet<IUnitObject>();
-        GameObject _reachedTarget = null;
         void OnTriggerEnter(IUnitObject other)
         {
             _neighbours.Add(other);

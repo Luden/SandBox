@@ -8,11 +8,11 @@ namespace Assets.Scripts.Perception
 {
     public class Visibility
     {
-        Faction _faction;
+        //Faction _faction;
 
         public Visibility(Faction faction)
         {
-            _faction = faction;
+            //_faction = faction;
         }
     }
 }

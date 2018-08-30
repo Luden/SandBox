@@ -11,14 +11,12 @@ namespace Assets.Scripts.Commands
         private Queue<CommandBase> _commands = new Queue<CommandBase>();
         private CommandBase _currentCommand;
 
-        private Unit _owner; // dont know how to remove cyclic dependance
         private CommandFactory _commandFactory;
         private RegularUpdate _update;
         private TimeManager _timeManager;
 
         public CommandProcessor(CommandFactory commandFactory, TimeManager timeManager, float updatePeriod, Unit owner)
         {
-            _owner = owner;
             _commandFactory = commandFactory;
             _timeManager = timeManager;
         }

@@ -57,6 +57,8 @@ namespace Assets.Scripts
             ShotsManager = new ShotsManager();
 
             _managers[UnitManager.ManagerType] = UnitManager;
+            _managers[UnitViewManager.ManagerType] = UnitViewManager;
+            _managers[UnitObjectManager.ManagerType] = UnitObjectManager;
             _managers[InputManager.ManagerType] = InputManager;
             _managers[SelectionManager.ManagerType] = SelectionManager;
             _managers[CommandManager.ManagerType] = CommandManager;

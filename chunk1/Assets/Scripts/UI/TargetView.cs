@@ -20,6 +20,7 @@ namespace Assets.Scripts.UI
             _unit.Targeting.OnTargetChange += UpdateTarget;
 
             _visual = GetComponent<MeshRenderer>();
+            SetTargeted(false);
         }
 
         private void UpdateTarget(Unit Target)

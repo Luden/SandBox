@@ -30,7 +30,6 @@ namespace Assets.Scripts.Movement
         private Vector3 _initialTarget;
         private Vector3 _navMeshTarget;
 
-        private float _stopCheckSpeedSquared = 0f;
         private bool _alreadyReachedTarget = false;
         private float _lastDistanceToTarget = 0f;
 
@@ -38,7 +37,8 @@ namespace Assets.Scripts.Movement
         {
             var provider = ManagerProvider.Instance;
             _timeManager = provider.TimeManager;
-            Neighbourhood = new Neighbourhood(unitObject);
+            _unitObject = unitObject;
+            Neighbourhood = new Neighbourhood(_unitObject);
         }
 
         public void Go(Vector3 target)
@@ -58,7 +58,6 @@ namespace Assets.Scripts.Movement
 
             _unitObject.NavMeshAgent.SetDestination(_navMeshTarget);
             _unitObject.NavMeshAgent.avoidancePriority = MovePriority;
-            _stopCheckSpeedSquared = _unitObject.NavMeshAgent.speed * _unitObject.NavMeshAgent.speed * StopCheckSpeedPart;
             _timeManager.StartUpdate(ref _update, RegularUpdate, 0.1f);
         }
 

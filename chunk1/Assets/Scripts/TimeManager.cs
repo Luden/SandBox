@@ -85,30 +85,32 @@ namespace Assets.Scripts
 
 		private IEnumerator Update()
 		{
-            float time = GetTime();
+            while (true)
+            {
+                float time = GetTime();
 
-            if (_taskToRemove.Count > 0)
-			{
-				foreach (var task in _taskToRemove)
-				{
-					_tasks.Remove(task);
-					_taskPool.Add(task);
-				}
-				_taskToRemove.Clear();
-			}
+                if (_taskToRemove.Count > 0)
+                {
+                    foreach (var task in _taskToRemove)
+                    {
+                        _tasks.Remove(task);
+                        _taskPool.Add(task);
+                    }
+                    _taskToRemove.Clear();
+                }
 
-			foreach (var task in _tasks)
-			{
-				if (!task.IsCancelled && task.LastUpdate + task.Period < time)
-				{
-					task.Update(time - task.LastUpdate);
-					task.LastUpdate = time;
-                    if (task.IsOnce)
-                        StopUpdate(task);
-				}
-			}
-
-            yield return null;
+                foreach (var task in _tasks)
+                {
+                    if (!task.IsCancelled && task.LastUpdate + task.Period < time)
+                    {
+                        task.Update(time - task.LastUpdate);
+                        task.LastUpdate = time;
+                        if (task.IsOnce)
+                            StopUpdate(task);
+                    }
+                }
+                yield return null;
+            }
 		}
     }
 }

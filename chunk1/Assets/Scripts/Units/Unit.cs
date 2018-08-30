@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Assets.Scripts.Commands;
 using Assets.Scripts.Core;
 using Assets.Scripts.Movement;
@@ -25,6 +26,8 @@ namespace Assets.Scripts.Units
         public Hull Hull;
         public Partset Partset;
 
+        public Action<Unit> OnDeath;
+
         public Unit(int id, IUnitObject unitObject, Faction startingFaction)
         {
             Id = id;
@@ -50,6 +53,8 @@ namespace Assets.Scripts.Units
             Navigation.Stop();
             Following.Stop();
             Arsenal.Stop();
+            if (OnDeath != null)
+                OnDeath(this);
         }
 
         public void Stop()
