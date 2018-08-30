@@ -27,12 +27,12 @@ public class UnitManager : IManager
     public void AddUnit()
     {
         var unitObject = _unitObjectManager.CreateUnitObject();
-        AddUnit(unitObject);
+        AddUnit(unitObject, Faction.N);
     }
 
-    public void AddUnit(IUnitObject unitObject, Dictionary<int, PartType> parts = null)
+    public void AddUnit(IUnitObject unitObject, Faction faction, Dictionary<int, PartType> parts = null)
     {
-        var unit = new Unit(++_lastID, unitObject, Faction.N);
+        var unit = new Unit(++_lastID, unitObject, faction);
         unitObject.Init(unit);
 
         if (parts != null)

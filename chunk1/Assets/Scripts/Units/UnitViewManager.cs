@@ -40,7 +40,7 @@ namespace Assets.Scripts.Units
             {
                 if (view.Id != 0 && Units.ContainsKey(view.Id))
                     continue;
-                _unitManager.AddUnit(view.GetComponentInChildren<UnitObject>(), view.GetInstalledParts());
+                _unitManager.AddUnit(view.GetComponentInChildren<UnitObject>(), view.Faction, view.GetInstalledParts());
             }
             _viewsToProcess.Clear();
             _timeManager.StopUpdate(ref _updateAddedViews);

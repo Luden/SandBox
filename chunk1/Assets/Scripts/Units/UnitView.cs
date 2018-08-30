@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Assets.Scripts.Core;
 using Assets.Scripts.Parts;
 using Assets.Scripts.UI;
 using UnityEngine;
@@ -11,6 +12,7 @@ namespace Assets.Scripts.Units
         [NonSerialized] public int Id;
         [NonSerialized] public TargetView TargetView;
         public Dictionary<int, SlotView> Slots = new Dictionary<int, SlotView>();
+        public Faction Faction;
 
         private Unit _unit;
         private PartViewsManager _partViewsManager;
