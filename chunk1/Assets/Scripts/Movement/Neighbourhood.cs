@@ -15,6 +15,7 @@ namespace Assets.Scripts.Movement
         {
             _unitObject = unitObject;
             _unitObject.OnColliderEnter += OnTriggerEnter;
+            _unitObject.OnColliderExit += OnTriggerExit;
         }
 
         HashSet<IUnitObject> _neighbours = new HashSet<IUnitObject>();

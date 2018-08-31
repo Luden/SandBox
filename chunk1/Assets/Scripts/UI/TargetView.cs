@@ -34,12 +34,13 @@ namespace Assets.Scripts.UI
             {
                 _lastTarget = _unit.Targeting.CurrentTarget;
 
+                if (_lastTargetView != null)
+                    _lastTargetView.SetTargeted(false);
+
                 if (_lastTarget != null)
-                {
-                    if (_lastTargetView != null)
-                        _lastTargetView.SetTargeted(false);
                     _lastTargetView = _unitViewManager.Units[_lastTarget.Id].TargetView;
-                }
+                else
+                    _lastTargetView = null;
             }
 
             if (_lastTargetView != null)

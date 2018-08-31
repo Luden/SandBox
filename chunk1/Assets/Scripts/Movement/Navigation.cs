@@ -99,14 +99,14 @@ namespace Assets.Scripts.Movement
             UpdateGiveWay();
         }
 
-        public bool IsUnitReachedTarget(Vector3 point)
+        public bool IsUnitReachedTarget(Vector3 point, float epsilon = 1f)
         {
-            return (_unitObject.Position - point).sqrMagnitude < 1f;
+            return (_unitObject.Position - point).sqrMagnitude < epsilon;
         }
 
         public bool IsUnitOrNeighboursReachedTarget(Vector3 point, int hash = -1)
         {
-            return IsUnitReachedTarget(point) || Neighbourhood.IsNeighboursReachedTarget(point, hash);
+            return IsUnitReachedTarget(point, hash == -1 ? 0.01f : 1f) || Neighbourhood.IsNeighboursReachedTarget(point, hash);
         }
 
         private void UpdatePathComplete()
