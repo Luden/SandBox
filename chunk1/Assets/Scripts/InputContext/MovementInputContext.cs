@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Assets.Scripts.Commands;
+using Assets.Scripts.Core;
 using Assets.Scripts.Input;
 using Assets.Scripts.Units;
 using UnityEngine;
@@ -36,11 +37,16 @@ namespace Assets.Scripts.InputContext
 
 		private void OnSelectionChange(List<Unit> selected, List<Unit> added, List<Unit> removed)
 		{
-			if (!IsEnabled() && selected.Count > 0)
+			if (!IsEnabled() && CanCommand(selected))
 				Enable();
-			else if (IsEnabled() && selected.Count == 0)
+			else if (IsEnabled() && !CanCommand(selected))
 				Disable();
 		}
+
+        private bool CanCommand(List<Unit> selected)
+        {
+            return selected.Count > 0 && selected[0].Player.Faction == Faction.A;
+        }
 
 		private void OnRightClick(Vector3 start, Vector3 finish)
 		{

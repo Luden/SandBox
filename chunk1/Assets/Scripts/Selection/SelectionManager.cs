@@ -59,12 +59,13 @@ public class SelectionManager : IManager
 		foreach (var unit in _unitsManager.Units)
         {
             var inRect = CheckInRect(screenPos1, screenPos2, unit);
-            if (!unit.Selectable.Selected && inRect)
+            var shouldBeSelected = inRect && unit.Player.Faction == Faction.A;
+            if (!unit.Selectable.Selected && shouldBeSelected)
 			{
 				_recentlySelectedUnits.Add(unit);
                 unit.Selectable.Selected = true;
 			}
-			else if (unit.Selectable.Selected && !inRect)
+			else if (unit.Selectable.Selected && !shouldBeSelected)
 			{
 				_recentlyDeselectedUnits.Add(unit);
                 unit.Selectable.Selected = false;
