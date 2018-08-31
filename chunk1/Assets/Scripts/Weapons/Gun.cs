@@ -91,7 +91,7 @@ namespace Assets.Scripts.Weapons
             if (!CheckTarget(_targeting.CurrentTarget))
                 return false;
 
-            return !Shooter.IsShooting && !Reloader.IsReloading && !Aimer.IsAimed;
+            return !Shooter.IsShooting && !Reloader.IsReloading && Aimer.IsAimed;
         }
 
         private bool IsTargetValid()

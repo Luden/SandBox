@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Parts;
+﻿using System.Collections;
+using Assets.Scripts.Parts;
 using UnityEngine;
 
 namespace Assets.Scripts.Weapons
@@ -14,14 +15,30 @@ namespace Assets.Scripts.Weapons
         {
             base.Init(part);
             _gun = part as Gun;
+            _gun.Aimer.OnAimingStarted += OnAimingStarted;
+            _gun.Aimer.OnAimingFinished += OnAimingFinished;
         }
 
-        void Update()
+        private void OnAimingStarted()
         {
-            if (_gun.Aimer.Pitch != _oldRotation)
+            StartCoroutine(UpdateAiming());
+        }
+
+        private void OnAimingFinished()
+        {
+            StopCoroutine(UpdateAiming());
+        }
+
+        private IEnumerator UpdateAiming()
+        {
+            while (true)
             {
-                _oldRotation = _gun.Aimer.GetPitch(Time.time);
-                Turret.rotation = Quaternion.Euler(0f, _oldRotation, 0f);
+                if (_gun.Aimer.Pitch != _oldRotation)
+                {
+                    _oldRotation = _gun.Aimer.GetPitch(Time.time);
+                    Turret.rotation = Quaternion.Euler(0f, _oldRotation, 0f);
+                }
+                yield return null;
             }
         }
     }

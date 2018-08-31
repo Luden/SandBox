@@ -8,6 +8,7 @@ namespace Assets.Scripts.Weapons
 {
     public class Aimer
     {
+        public Action OnAimingStarted;
         public Action OnAimingFinished;
 
         public float AimingSpeed = 5f;
@@ -15,7 +16,7 @@ namespace Assets.Scripts.Weapons
         public float Pitch;
         public float TargetPitch;
         public float TotalPitch { get { return (Pitch + _navigation.Pitch).Clamp360(); } }
-        public bool IsAimed { get { return Euler.Diff(Pitch, TargetPitch) > Mathf.Epsilon; } }
+        public bool IsAimed { get { return Euler.Diff(Pitch, TargetPitch) < Mathf.Epsilon; } }
         public bool IsAiming { get { return _update != null; } }
 
         private Navigation _navigation;
@@ -50,15 +51,16 @@ namespace Assets.Scripts.Weapons
             Pitch = GetPitchDelta(dt);
             _lastUpdateTime = _timeManager.GetTime();
 
-            if (!IsAimed)
+            if (IsAimed)
                 CompleteAiming();
         }
 
         public bool Check()
         {
-            if (!IsAimed && !IsAiming)
+            if (!IsAimed)
             {
-                StartAiming(_targeting.CurrentTarget);
+                if (!IsAiming)
+                    StartAiming(_targeting.CurrentTarget);
                 return false;
             }
             return true;
@@ -67,8 +69,12 @@ namespace Assets.Scripts.Weapons
         public void StartAiming(Unit target)
         {
             TargetPitch = CalculatePitch(target.Navigation.Position);
-            if (IsAimed)
+            if (!IsAimed)
+            {
                 _timeManager.StartUpdate(ref _update, Update, 0.1f);
+                if (OnAimingStarted != null)
+                    OnAimingStarted();
+            }
             else
                 CompleteAiming();
         }
