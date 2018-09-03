@@ -9,7 +9,7 @@ namespace Assets.Scripts.Weapons
         public Transform Turret;
 
         private Gun _gun;
-        private float _oldRotation;
+        private Coroutine _updateAiming;
 
         public override void Init(Part part)
         {
@@ -21,23 +21,20 @@ namespace Assets.Scripts.Weapons
 
         private void OnAimingStarted()
         {
-            StartCoroutine(UpdateAiming());
+            _updateAiming = StartCoroutine(UpdateAiming());
         }
 
         private void OnAimingFinished()
         {
-            StopCoroutine(UpdateAiming());
+            StopCoroutine(_updateAiming);
         }
 
         private IEnumerator UpdateAiming()
         {
             while (true)
             {
-                if (_gun.Aimer.Pitch != _oldRotation)
-                {
-                    _oldRotation = _gun.Aimer.GetPitch(Time.time);
-                    Turret.rotation = Quaternion.Euler(0f, _oldRotation, 0f);
-                }
+                var rotation = _gun.Aimer.GetPitch(Time.time);
+                Turret.localRotation = Quaternion.Euler(0f, rotation, 0f);
                 yield return null;
             }
         }

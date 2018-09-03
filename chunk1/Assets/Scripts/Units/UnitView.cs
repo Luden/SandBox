@@ -35,6 +35,9 @@ namespace Assets.Scripts.Units
 
             _unit.Partset.OnPartAttached += OnPartAttached;
             _unit.Partset.OnPartDetached += OnPartDetached;
+            foreach (var pair in _unit.Partset.Parts)
+                if (pair.Value != null)
+                    OnPartAttached(pair.Value, pair.Key);
 
             TargetView = GetComponentInChildren<TargetView>();
         }

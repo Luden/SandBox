@@ -25,7 +25,7 @@ namespace Assets.Scripts.Parts
 
         public void ReleaseView(PartView view)
         {
-            Destroy(view);
+            Destroy(view.gameObject);
         }
     }
 }

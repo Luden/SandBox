@@ -9,8 +9,8 @@ namespace Assets.Scripts.Weapons
 {
     public class Gun : Part
     {
-        public Vector3 BarrelOffset;
-        public override PartType Type { get { return PartType.None; } }
+        public Vector3 BarrelOffset = Vector3.up;
+        public override PartType Type { get { return PartType.Gun; } }
         public float Range = 10f;
 
         private TimeManager _timeManager;
@@ -18,13 +18,15 @@ namespace Assets.Scripts.Weapons
         private Targeting _targeting;
         private ShotsManager _shotsManager;
         private Vector3 _targetPosition;
+        private int _ownerId;
 
         public Reloader Reloader { get; private set; }
         public Shooter Shooter { get; private set; }
         public Aimer Aimer { get; private set; }
 
-        public void Init(Targeting targeting, Navigation navigation, ShotsManager shotsManager, TimeManager timeManager)
+        public void Init(int ownerId, Targeting targeting, Navigation navigation, ShotsManager shotsManager, TimeManager timeManager)
         {
+            _ownerId = ownerId;
             _navigation = navigation;
             _targeting = targeting;
             _timeManager = timeManager;
@@ -74,7 +76,7 @@ namespace Assets.Scripts.Weapons
         private void OnShoot()
         {
             var worldOffset = Quaternion.AngleAxis(Aimer.Pitch, Vector3.up) * BarrelOffset;
-            _shotsManager.AddShot(_navigation.Position + worldOffset, _targetPosition);
+            _shotsManager.AddShot(_ownerId, _navigation.Position + worldOffset, _targetPosition + new Vector3(0, 0.5f, 0));
         }
 
         public void StartShooting()

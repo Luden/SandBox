@@ -24,6 +24,7 @@ namespace Assets.Scripts.Units
             _unitManager = ManagerProvider.Instance.UnitManager;
             _timeManager = ManagerProvider.Instance.TimeManager;
             _unitManager.OnUnitCreated += OnUnitCreated;
+            _unitManager.OnUnitDestroyed += OnUnitDestroyed;
             ProcessAddedViews(0f);
         }
 
@@ -44,6 +45,17 @@ namespace Assets.Scripts.Units
             }
             _viewsToProcess.Clear();
             _timeManager.StopUpdate(ref _updateAddedViews);
+        }
+
+        private void OnUnitDestroyed(Unit unit)
+        {
+            UnitView view;
+            Units.TryGetValue(unit.Id, out view);
+            if (view == null)
+                return;
+
+            Units.Remove(unit.Id);
+            Destroy(view.gameObject);
         }
 
         private void OnUnitCreated(Unit unit)

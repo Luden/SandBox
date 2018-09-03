@@ -40,7 +40,7 @@ namespace Assets.Scripts.Units
             Navigation = new Navigation(UnitObject);
             Following = new Following(Navigation, provider.TimeManager);
             Targeting = new Targeting(Navigation, Player.Faction);
-            Arsenal = new Arsenal(Navigation, Targeting, Following, Partset, provider.ShotsManager, provider.TimeManager);
+            Arsenal = new Arsenal(Id, Navigation, Targeting, Following, Partset, provider.ShotsManager, provider.TimeManager);
             Selectable = new Selectable();
             Visibility = new Visibility(Player.Faction);
             Hull = new Hull();

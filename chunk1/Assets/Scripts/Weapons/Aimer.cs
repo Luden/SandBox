@@ -11,12 +11,12 @@ namespace Assets.Scripts.Weapons
         public Action OnAimingStarted;
         public Action OnAimingFinished;
 
-        public float AimingSpeed = 5f;
+        public float AimingSpeed = 90;
 
         public float Pitch;
         public float TargetPitch;
         public float TotalPitch { get { return (Pitch + _navigation.Pitch).Clamp360(); } }
-        public bool IsAimed { get { return Euler.Diff(Pitch, TargetPitch) < Mathf.Epsilon; } }
+        public bool IsAimed { get { return Mathf.Abs(Euler.Diff(TotalPitch, TargetPitch)) < 0.1f; } }
         public bool IsAiming { get { return _update != null; } }
 
         private Navigation _navigation;
@@ -35,12 +35,15 @@ namespace Assets.Scripts.Weapons
 
         public float GetPitch(float time)
         {
-            return GetPitchDelta(time - _lastUpdateTime);
+            if (IsAiming)
+                return GetPitchDelta(time - _lastUpdateTime);
+            else
+                return Pitch;
         }
 
         private float GetPitchDelta(float dt)
         {
-            var remaining = Euler.Diff(TargetPitch, TotalPitch);
+            var remaining = Euler.Diff(TotalPitch, TargetPitch);
             var sign = Math.Sign(remaining);
             var delta = Math.Min(AimingSpeed * dt, Mathf.Abs(remaining));
             return (Pitch + delta * sign).Clamp360();
@@ -57,6 +60,8 @@ namespace Assets.Scripts.Weapons
 
         public bool Check()
         {
+            if (_targeting.CurrentTarget != null)
+                TargetPitch = CalculatePitch(_targeting.CurrentTarget.Navigation.Position);
             if (!IsAimed)
             {
                 if (!IsAiming)
@@ -68,10 +73,10 @@ namespace Assets.Scripts.Weapons
 
         public void StartAiming(Unit target)
         {
-            TargetPitch = CalculatePitch(target.Navigation.Position);
             if (!IsAimed)
             {
                 _timeManager.StartUpdate(ref _update, Update, 0.1f);
+                _lastUpdateTime = _timeManager.GetTime();
                 if (OnAimingStarted != null)
                     OnAimingStarted();
             }
@@ -83,7 +88,7 @@ namespace Assets.Scripts.Weapons
         {
             var direction = target - _navigation.Position;
             direction.y = 0;
-            return Vector3.Angle(Vector3.forward, direction);
+            return Vector3.SignedAngle(Vector3.forward, direction, Vector3.up);
         }
 
         private void CompleteAiming()

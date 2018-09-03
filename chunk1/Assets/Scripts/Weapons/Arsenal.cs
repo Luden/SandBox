@@ -15,11 +15,13 @@ namespace Assets.Scripts.Weapons
         private Targeting _targeting;
         private Following _following;
         private Partset _partset;
+        private int _ownerId;
 
         public List<Gun> Guns = new List<Gun>();
 
-        public Arsenal(Navigation navigation, Targeting targeting, Following following, Partset partset, ShotsManager shotsManager, TimeManager timeManager)
+        public Arsenal(int ownerId, Navigation navigation, Targeting targeting, Following following, Partset partset, ShotsManager shotsManager, TimeManager timeManager)
         {
+            _ownerId = ownerId;
             _shotsManager = shotsManager;
             _timeManager = timeManager;
             _targeting = targeting;
@@ -42,7 +44,7 @@ namespace Assets.Scripts.Weapons
             if (gun == null || Guns.Contains(gun))
                 return;
 
-            gun.Init(_targeting, _navigation, _shotsManager, _timeManager);
+            gun.Init(_ownerId, _targeting, _navigation, _shotsManager, _timeManager);
             Guns.Add(gun);
         }
 
@@ -64,7 +66,10 @@ namespace Assets.Scripts.Weapons
             if (unit == null)
                 Stop();
             else
+            {
                 _timeManager.StartUpdate(ref _update, Update, 0.1f);
+                Update(0);
+            }
         }
 
         private void Update(float dt)

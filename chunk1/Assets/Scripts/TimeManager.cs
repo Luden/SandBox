@@ -99,8 +99,9 @@ namespace Assets.Scripts
                     _taskToRemove.Clear();
                 }
 
-                foreach (var task in _tasks)
+                for (int i = 0; i < _tasks.Count; i++)
                 {
+                    var task = _tasks[i];
                     if (!task.IsCancelled && task.LastUpdate + task.Period < time)
                     {
                         task.Update(time - task.LastUpdate);

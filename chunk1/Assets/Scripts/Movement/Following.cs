@@ -78,7 +78,7 @@ namespace Assets.Scripts.Movement
                 Stop();
 
             var targetPos = _target.Navigation.Position;
-            if (Vector3.SqrMagnitude(targetPos - _lastTargetPos) < _minDelta)
+            if (Vector3.SqrMagnitude(targetPos - _lastTargetPos) < 0.1f)
                 return;
 
             _lastTargetPos = targetPos;

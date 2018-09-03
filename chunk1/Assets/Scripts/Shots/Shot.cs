@@ -9,14 +9,16 @@ namespace Assets.Scripts.Shots
         public Vector3 StartPosition;
         public Vector3 TargetPosition;
         public Vector3 Direction;
+        public int OwnerId;
 
-        public float Damage;
-        public float Velocity;
+        public float Damage = 10;
+        public float Velocity = 10;
 
         private float _time;
 
-        public Shot(Vector3 position, Vector3 targetPosition, float time)
+        public Shot(int ownerId, Vector3 position, Vector3 targetPosition, float time)
         {
+            OwnerId = ownerId;
             _time = time;
             Position = position;
             StartPosition = Position;
@@ -28,7 +30,7 @@ namespace Assets.Scripts.Shots
         {
             _time += dt;
             OldPosition = Position;
-            Position = GetPosition(dt);
+            Position = GetPositionDelta(dt);
         }
 
         public Vector3 GetPosition(float time)

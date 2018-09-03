@@ -41,7 +41,7 @@ namespace Assets.Scripts.Shots
                 return;
 
             _shotViews.Remove(shot);
-            Destroy(shotView);
+            Destroy(shotView.gameObject);
         }
     }
 }

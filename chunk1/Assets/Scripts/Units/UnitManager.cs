@@ -13,6 +13,7 @@ public class UnitManager : IManager
     public ManagerType ManagerType { get { return ManagerType.Unit; } }
     public List<Unit> Units = new List<Unit>();
     public Action<Unit> OnUnitCreated;
+    public Action<Unit> OnUnitDestroyed;
 
     private UnitObjectManager _unitObjectManager;
     private PartsManager _partsManager;
@@ -40,8 +41,17 @@ public class UnitManager : IManager
                 unit.Partset.AttachPart(pair.Key, _partsManager.CreatePart(pair.Value));
 
         Units.Add(unit);
+        unit.OnDeath += OnUnitDeath;
 
         if (OnUnitCreated != null)
             OnUnitCreated(unit);
     }
+
+    private void OnUnitDeath(Unit unit)
+    {
+        Units.Remove(unit);
+        if (OnUnitDestroyed != null)
+            OnUnitDestroyed(unit);
+    }
+
 }

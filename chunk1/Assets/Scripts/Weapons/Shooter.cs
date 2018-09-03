@@ -11,7 +11,7 @@ namespace Assets.Scripts.Weapons
         public int ShotsInBarrage = 3;
 
         public float ShootCooldown;
-        public bool IsShooting { get { return RemainingShots <= 0; } }
+        public bool IsShooting { get { return _update != null; } }
         public int RemainingShots;
 
         private TimeManager _timeManager;
@@ -30,7 +30,7 @@ namespace Assets.Scripts.Weapons
 
             MakeShot();
 
-            if (!IsShooting)
+            if (RemainingShots <= 0)
                 FinishShooting();
         }
 

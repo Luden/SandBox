@@ -24,9 +24,9 @@ namespace Assets.Scripts.Shots
             _timeManager.StartUpdate(ref _update, RegularUpdate, 0.1f);
         }
 
-        public void AddShot(Vector3 start, Vector3 finish)
+        public void AddShot(int ownerId, Vector3 start, Vector3 finish)
         {
-            var shot = new Shot(start, finish, _timeManager.GetTime());
+            var shot = new Shot(ownerId, start, finish, _timeManager.GetTime());
             if (OnShotCreated != null)
                 OnShotCreated(shot);
             _shots.Add(shot);
@@ -44,9 +44,13 @@ namespace Assets.Scripts.Shots
                 RaycastHit hit;
                 if (Physics.Raycast(shot.OldPosition, direction, out hit, magnitude))
                 {
-                    var unit = hit.transform.GetComponent<Unit>();
+                    var unit = hit.transform.GetComponent<UnitObject>();
                     if (unit != null)
-                        unit.Hull.ApplyShot(shot);
+                    {
+                        if (unit.Owner.Id == shot.OwnerId)
+                            continue;
+                        unit.Owner.Hull.ApplyShot(shot);
+                    }
                     
                     FastRemove(i--);
 

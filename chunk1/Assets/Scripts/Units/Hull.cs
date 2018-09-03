@@ -9,7 +9,7 @@ namespace Assets.Scripts.Units
     public class Hull
     {
         public float Health;
-        public bool IsDead { get { return Health > 0f; } }
+        public bool IsDead { get { return Health <= 0f; } }
 
         public Action OnDeath;
         public Action OnDamage;

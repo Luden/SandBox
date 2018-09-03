@@ -21,7 +21,7 @@ namespace Assets.Scripts.Core
             else if (diff > 180f)
                 diff = y + 360f - x;
 
-            return diff.Clamp360();
+            return diff;
         }
     }
 }
