@@ -35,16 +35,16 @@ namespace Assets.Scripts.Weapons
             _targeting.OnTargetChange += OnTargetChange;
         }
 
-        private void OnPartAttached(Part part, int slot)
+        private void OnPartAttached(Slot slot)
         {
-            if (part.Type != PartType.Gun)
+            if (slot.Part.Type != PartType.Gun)
                 return;
 
-            var gun = part as Gun;
+            var gun = slot.Part as Gun;
             if (gun == null || Guns.Contains(gun))
                 return;
 
-            gun.Init(_ownerId, _targeting, _navigation, _shotsManager, _timeManager);
+            gun.Init(_ownerId, slot.Offset, _targeting, _navigation, _shotsManager, _timeManager);
             Guns.Add(gun);
         }
 

@@ -9,9 +9,10 @@ namespace Assets.Scripts.Weapons
 {
     public class Gun : Part
     {
-        public Vector3 BarrelOffset = Vector3.up;
+        public Vector3 BarrelOffset = new Vector3(0f, 0.07f, 0.21f);
         public override PartType Type { get { return PartType.Gun; } }
         public float Range = 10f;
+        public float Dispersion = 0.1f;
 
         private TimeManager _timeManager;
         private Navigation _navigation;
@@ -19,13 +20,15 @@ namespace Assets.Scripts.Weapons
         private ShotsManager _shotsManager;
         private Vector3 _targetPosition;
         private int _ownerId;
+        private Vector3 _slotOffset;
 
         public Reloader Reloader { get; private set; }
         public Shooter Shooter { get; private set; }
         public Aimer Aimer { get; private set; }
 
-        public void Init(int ownerId, Targeting targeting, Navigation navigation, ShotsManager shotsManager, TimeManager timeManager)
+        public void Init(int ownerId, Vector3 slotOffset, Targeting targeting, Navigation navigation, ShotsManager shotsManager, TimeManager timeManager)
         {
+            _slotOffset = slotOffset;
             _ownerId = ownerId;
             _navigation = navigation;
             _targeting = targeting;
@@ -75,8 +78,17 @@ namespace Assets.Scripts.Weapons
 
         private void OnShoot()
         {
-            var worldOffset = Quaternion.AngleAxis(Aimer.Pitch, Vector3.up) * BarrelOffset;
-            _shotsManager.AddShot(_ownerId, _navigation.Position + worldOffset, _targetPosition + new Vector3(0, 0.5f, 0));
+            var worldOffset = Quaternion.AngleAxis(Aimer.Pitch + _navigation.Pitch, Vector3.up) * BarrelOffset;
+            var slotOffset = Quaternion.AngleAxis(_navigation.Pitch, Vector3.up) * _slotOffset;
+
+            var distance = Vector3.Distance(_navigation.Position, _targetPosition);
+            var delta = Dispersion * distance / 2f;
+            var dispersionVector = new Vector3(UnityEngine.Random.Range(-delta, delta), 0f, UnityEngine.Random.Range(-delta, delta));
+            var heightTargetOffset = new Vector3(0, 0.5f, 0);
+
+            var shotOrigin = _navigation.Position + worldOffset + slotOffset;
+            var shotTarget = _targetPosition + heightTargetOffset + dispersionVector;
+            _shotsManager.AddShot(_ownerId, shotOrigin, shotTarget);
         }
 
         public void StartShooting()
@@ -115,7 +127,7 @@ namespace Assets.Scripts.Weapons
 
         public void Stop()
         {
-            Reloader.Stop();
+            // Reloader.Stop();
             Aimer.Stop();
             Shooter.Stop();
         }

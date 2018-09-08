@@ -5,17 +5,23 @@ namespace Assets.Scripts.Parts
 {
     public class Partset
     {
-        public Action<Part, int> OnPartAttached;
+        public Action<Slot> OnPartAttached;
         public Action<Part, int> OnPartDetached;
 
-        public Dictionary<int, Part> Parts = new Dictionary<int, Part>();
-
-        private int _slotsCount = 9;
+        public Dictionary<int, Slot> Slots = new Dictionary<int, Slot>();
 
         public Partset()
         {
-            for (int i = 0; i < _slotsCount; i++)
-                Parts[i] = null;
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                {
+                    var slot = new Slot();
+                    slot.Offset = new UnityEngine.Vector3((i - 1) * 0.33f, 0.569f - 0.049f, (j - 1) * 0.33f);
+                    slot.Index = i * 3 + j;
+                    Slots[i * 3 + j] = slot;
+                }
+            }
         }
 
         public void AttachPart(Part part)
@@ -27,31 +33,32 @@ namespace Assets.Scripts.Parts
             AttachPart(slot, part);
         }
 
-        public void AttachPart(int slot, Part part)
+        public void AttachPart(int slotNum, Part part)
         {
-            Part existingPart;
-            Parts.TryGetValue(slot, out existingPart);
-            if (existingPart != null)
+            Slot slot;
+            Slots.TryGetValue(slotNum, out slot);
+            if (slot == null || slot.Part != null)
                 return;
             if (GetPartIndex(part) != -1)
                 return;
 
-            Parts[slot] = part;
+            slot.Part = part;
 
             if (OnPartAttached != null)
-                OnPartAttached(part, slot);
+                OnPartAttached(slot);
         }
 
-        public void DetachPart(int slot)
+        public void DetachPart(int slotNum)
         {
-            Part part;
-            Parts.TryGetValue(slot, out part);
-            if (part == null)
+            Slot slot;
+            Slots.TryGetValue(slotNum, out slot);
+            if (slot == null || slot.Part == null)
                 return;
 
-            Parts[slot] = null;
+            var part = slot.Part;
+            Slots[slotNum].Part = null;
             if (OnPartDetached != null)
-                OnPartDetached(part, slot);
+                OnPartDetached(part, slotNum);
         }
 
         public void DetachPart(Part part)
@@ -65,9 +72,9 @@ namespace Assets.Scripts.Parts
             if (part == null)
                 return -1;
 
-            foreach (var pair in Parts)
+            foreach (var pair in Slots)
             {
-                if (pair.Value == part)
+                if (pair.Value.Part == part)
                     return pair.Key;
             }
             return -1;
@@ -75,9 +82,9 @@ namespace Assets.Scripts.Parts
 
         private int GetFreeSlot()
         {
-            foreach (var pair in Parts)
+            foreach (var pair in Slots)
             {
-                if (pair.Value == null)
+                if (pair.Value.Part == null)
                     return pair.Key;
             }
             return -1;

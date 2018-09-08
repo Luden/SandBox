@@ -7,7 +7,7 @@ namespace Assets.Scripts.Weapons
         public Action OnShoot;
         public Action OnShootingFinished;
 
-        public float BarrageDelay = 0.5f;
+        public float BarrageDelay = 0.1f;
         public int ShotsInBarrage = 3;
 
         public float ShootCooldown;

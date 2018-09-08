@@ -25,7 +25,7 @@ namespace Assets.Scripts.Units
             if (OnDamage != null)
                 OnDamage();
 
-            if (Health < 0f)
+            if (Health <= 0f)
                 Die();
         }
 

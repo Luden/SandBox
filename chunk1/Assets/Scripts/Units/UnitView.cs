@@ -35,9 +35,9 @@ namespace Assets.Scripts.Units
 
             _unit.Partset.OnPartAttached += OnPartAttached;
             _unit.Partset.OnPartDetached += OnPartDetached;
-            foreach (var pair in _unit.Partset.Parts)
-                if (pair.Value != null)
-                    OnPartAttached(pair.Value, pair.Key);
+            foreach (var pair in _unit.Partset.Slots)
+                if (pair.Value.Part != null)
+                    OnPartAttached(pair.Value);
 
             TargetView = GetComponentInChildren<TargetView>();
         }
@@ -53,23 +53,23 @@ namespace Assets.Scripts.Units
             return result;
         }
 
-        private void OnPartAttached(Part part, int slotNum)
+        private void OnPartAttached(Slot slot)
         {
-            SlotView slot;
-            Slots.TryGetValue(slotNum, out slot);
-            if (slot == null)
+            SlotView slotView;
+            Slots.TryGetValue(slot.Index, out slotView);
+            if (slotView == null)
                 return;
 
-            if (slot.PartView != null && slot.PartView.PartType != part.Type)
+            if (slotView.PartView != null && slotView.PartView.PartType != slot.Part.Type)
             {
-                _partViewsManager.ReleaseView(slot.PartView);
-                slot.PartView = null;
+                _partViewsManager.ReleaseView(slotView.PartView);
+                slotView.PartView = null;
             }
 
-            if (slot.PartView == null)
-                slot.PartView = _partViewsManager.CreateView(part.Type, slot.PartRoot);
+            if (slotView.PartView == null)
+                slotView.PartView = _partViewsManager.CreateView(slot.Part.Type, slotView.PartRoot);
 
-            slot.PartView.Init(part);
+            slotView.PartView.Init(slot.Part);
         }
 
         private void OnPartDetached(Part part, int slotNum)

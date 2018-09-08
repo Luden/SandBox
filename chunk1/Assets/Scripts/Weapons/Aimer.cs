@@ -11,7 +11,7 @@ namespace Assets.Scripts.Weapons
         public Action OnAimingStarted;
         public Action OnAimingFinished;
 
-        public float AimingSpeed = 90;
+        public float AimingSpeed = 180;
 
         public float Pitch;
         public float TargetPitch;

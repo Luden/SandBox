@@ -10,6 +10,7 @@ namespace Assets.Scripts.Weapons
         public Action OnReloadingFinish;
 
         public float ReloadTime = 5f;
+        public float ReloadTimeDispersion = 0.1f;
 
         public bool IsReloading { get { return ReloadRemainingTime > 0f; } }
         public float ReloadRemainingTime;
@@ -31,7 +32,7 @@ namespace Assets.Scripts.Weapons
 
         public void StartReloading()
         {
-            ReloadRemainingTime = ReloadTime;
+            ReloadRemainingTime = ReloadTime + ReloadTime * UnityEngine.Random.Range(-ReloadTimeDispersion / 2f, ReloadTimeDispersion / 2f);
             _timeManager.StartUpdate(ref _update, Update, 0.1f);
         }
 
@@ -46,7 +47,6 @@ namespace Assets.Scripts.Weapons
         public void Stop()
         {
             _timeManager.StopUpdate(ref _update);
-            ReloadRemainingTime = 0f;
         }
     }
 }
