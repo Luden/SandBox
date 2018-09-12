@@ -17,16 +17,23 @@ namespace Assets.Scripts.Weapons
             _gun = part as Gun;
             _gun.Aimer.OnAimingStarted += OnAimingStarted;
             _gun.Aimer.OnAimingFinished += OnAimingFinished;
+
+            _updateAiming = StartCoroutine(UpdateAiming());
         }
 
         private void OnAimingStarted()
         {
-            _updateAiming = StartCoroutine(UpdateAiming());
+            if (_updateAiming == null)
+                _updateAiming = StartCoroutine(UpdateAiming());
         }
 
         private void OnAimingFinished()
         {
-            StopCoroutine(_updateAiming);
+            if (_updateAiming != null)
+            {
+                StopCoroutine(_updateAiming);
+                _updateAiming = null;
+            }
         }
 
         private IEnumerator UpdateAiming()

@@ -6,8 +6,6 @@ namespace Assets.Scripts.Movement
 {
     public class Following
     {
-        private readonly float _minDelta = Mathf.Epsilon;
-
         private Unit _target;
         public Unit CurrentTarget { get; private set; }
         private TimeManager _timeManager;

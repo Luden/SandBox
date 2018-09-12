@@ -19,7 +19,11 @@ namespace Assets.Scripts.Weapons
 
         public void SetTarget(Unit target)
         {
+            if (CurrentTarget != null)
+                CurrentTarget.OnDeath -= OnDeath;
             CurrentTarget = target;
+            if (CurrentTarget != null)
+                CurrentTarget.OnDeath += OnDeath;
             CallTargetChange();
         }
 
@@ -34,8 +38,15 @@ namespace Assets.Scripts.Weapons
                 OnTargetChange(CurrentTarget);
         }
 
+        private void OnDeath(Unit unit)
+        {
+            SetTarget(null);
+        }
+
         public void Stop()
         {
+            if (CurrentTarget != null)
+                CurrentTarget.OnDeath -= OnDeath;
             CurrentTarget = null;
             CallTargetChange();
         }

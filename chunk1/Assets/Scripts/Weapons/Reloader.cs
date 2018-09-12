@@ -23,6 +23,11 @@ namespace Assets.Scripts.Weapons
             _timeManager = timeManager;
         }
 
+        public void Deinit()
+        {
+            Stop();
+        }
+
         private void Update(float dt)
         {
             ReloadRemainingTime -= dt;

@@ -40,15 +40,27 @@ namespace Assets.Scripts.Weapons
 
             Reloader.OnReloadingFinish += OnReloadingFinish;
             Shooter.OnShootingFinished += OnShootingFinished;
-            Aimer.OnAimingFinished += OnAimingFinished;
+            Aimer.OnAimed += OnAimed;
             Shooter.OnShoot += OnShoot;
+        }
+
+        public void Deinit()
+        {
+            Reloader.Deinit();
+            Shooter.Deinit();
+            Aimer.Deinit();
+
+            Reloader.OnReloadingFinish -= OnReloadingFinish;
+            Shooter.OnShootingFinished -= OnShootingFinished;
+            Aimer.OnAimed -= OnAimed;
+            Shooter.OnShoot -= OnShoot;
         }
 
         private void OnReloadingFinish()
         {
             if (!IsTargetValid())
                 return;
-            if (Aimer.Check())
+            if (Aimer.IsAimed)
                 StartShooting();
         }
 
@@ -58,16 +70,9 @@ namespace Assets.Scripts.Weapons
 
             if (!IsTargetValid())
                 return;
-
-            Aimer.Check();
         }
 
-        public void CheckAiming()
-        {
-            Aimer.Check();
-        }
-
-        private void OnAimingFinished()
+        private void OnAimed()
         {
             if (!IsTargetValid())
                 return;

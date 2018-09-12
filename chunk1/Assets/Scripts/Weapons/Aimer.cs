@@ -10,13 +10,14 @@ namespace Assets.Scripts.Weapons
     {
         public Action OnAimingStarted;
         public Action OnAimingFinished;
+        public Action OnAimed;
 
         public float AimingSpeed = 180;
 
         public float Pitch;
         public float TargetPitch;
         public float TotalPitch { get { return (Pitch + _navigation.Pitch).Clamp360(); } }
-        public bool IsAimed { get { return Mathf.Abs(Euler.Diff(TotalPitch, TargetPitch)) < 0.1f; } }
+        public bool IsAimed { get; private set; }
         public bool IsAiming { get { return _update != null; } }
 
         private Navigation _navigation;
@@ -31,6 +32,13 @@ namespace Assets.Scripts.Weapons
             _navigation = navigation;
             _timeManager = timeManager;
             _targeting = targeting;
+            _targeting.OnTargetChange += OnTargetChange;
+        }
+
+        public void Deinit()
+        {
+            _targeting.OnTargetChange -= OnTargetChange;
+            Stop();
         }
 
         public float GetPitch(float time)
@@ -51,37 +59,31 @@ namespace Assets.Scripts.Weapons
 
         private void Update(float dt)
         {
+            UpdateTargetPitch();
             Pitch = GetPitchDelta(dt);
             _lastUpdateTime = _timeManager.GetTime();
 
+            IsAimed = Mathf.Abs(Euler.Diff(TotalPitch, TargetPitch)) < 0.1f;
             if (IsAimed)
                 CompleteAiming();
         }
 
-        public bool Check()
+        private void UpdateTargetPitch()
         {
-            if (_targeting.CurrentTarget != null)
-                TargetPitch = CalculatePitch(_targeting.CurrentTarget.Navigation.Position);
-            if (!IsAimed)
-            {
-                if (!IsAiming)
-                    StartAiming(_targeting.CurrentTarget);
-                return false;
-            }
-            return true;
+            TargetPitch = _targeting.CurrentTarget != null
+                ? CalculatePitch(_targeting.CurrentTarget.Navigation.Position)
+                : _navigation.Pitch;
         }
 
-        public void StartAiming(Unit target)
+        private void OnTargetChange(Unit target)
         {
-            if (!IsAimed)
+            if (_update == null)
             {
                 _timeManager.StartUpdate(ref _update, Update, 0.1f);
-                _lastUpdateTime = _timeManager.GetTime();
                 if (OnAimingStarted != null)
                     OnAimingStarted();
+                Update(0f);
             }
-            else
-                CompleteAiming();
         }
 
         public float CalculatePitch(Vector3 target)
@@ -93,9 +95,17 @@ namespace Assets.Scripts.Weapons
 
         private void CompleteAiming()
         {
-            _timeManager.StopUpdate(ref _update);
-            if (OnAimingFinished != null)
-                OnAimingFinished();
+            if (_targeting.CurrentTarget == null)
+            {
+                _timeManager.StopUpdate(ref _update);
+                if (OnAimingFinished != null)
+                    OnAimingFinished();
+            }
+            else
+            {
+                if (OnAimed != null)
+                    OnAimed();
+            }
         }
 
         public void Stop()

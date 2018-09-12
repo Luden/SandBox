@@ -57,7 +57,7 @@ namespace Assets.Scripts.Weapons
             if (gun == null || !Guns.Contains(gun))
                 return;
 
-            gun.Stop();
+            gun.Deinit();
             Guns.Remove(gun);
         }
 
@@ -79,9 +79,6 @@ namespace Assets.Scripts.Weapons
                 Stop();
                 return;
             }
-
-            foreach (var gun in Guns)
-                gun.CheckAiming();
 
             var isReachedTarget = IsReachedTarget();
             if (_following.CurrentTarget == _targeting.CurrentTarget && isReachedTarget == _following.IsActive)
