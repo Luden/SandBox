@@ -8,7 +8,7 @@ namespace Assets.Scripts.Weapons
         public Action OnShootingFinished;
 
         public float BarrageDelay = 0.1f;
-        public int ShotsInBarrage = 3;
+        public int ShotsInBarrage = 1;
 
         public float ShootCooldown;
         public bool IsShooting { get { return _update != null; } }

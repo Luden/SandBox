@@ -86,7 +86,7 @@ public class SelectionManager : IManager
 	{
 		RaycastHit hit;
 		var ray = _mainCamera.ScreenPointToRay(screenPos);
-		if (Physics.Raycast(ray, out hit, 1000f, (1 << LayerMask.NameToLayer("Units"))))
+		if (Physics.Raycast(ray, out hit, 1000f, LayerMasks.Units))
 			return hit.transform.GetComponent<UnitObject>().Owner;
 		return null;
 	}
@@ -95,7 +95,7 @@ public class SelectionManager : IManager
 	{
 		RaycastHit hit;
 		var ray = _mainCamera.ScreenPointToRay(screenPos);
-		if (Physics.Raycast(ray, out hit, 1000f, (1 << LayerMask.NameToLayer("Terrain"))))
+		if (Physics.Raycast(ray, out hit, 1000f, LayerMasks.Terrain))
 			return hit.point;
 
 		return Vector3.zero;

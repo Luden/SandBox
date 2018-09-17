@@ -21,7 +21,7 @@ namespace Assets.Scripts.Units
         public Player Player;
         public Visibility Visibility;
         public Following Following;
-        public Targeting Targeting;
+        public UnitTargeting Targeting;
         public Arsenal Arsenal;
         public Hull Hull;
         public Partset Partset;
@@ -39,7 +39,7 @@ namespace Assets.Scripts.Units
             Partset = new Partset();
             Navigation = new Navigation(UnitObject);
             Following = new Following(Navigation, provider.TimeManager);
-            Targeting = new Targeting(Navigation, Player.Faction);
+            Targeting = new UnitTargeting(Player.Faction);
             Arsenal = new Arsenal(Id, Navigation, Targeting, Following, Partset, provider.ShotsManager, provider.TimeManager);
             Selectable = new Selectable();
             Visibility = new Visibility(Player.Faction);

@@ -10,26 +10,34 @@ namespace Assets.Scripts.Weapons
         public Action<Unit> OnTargetChange;
 
         public Unit CurrentTarget { get; private set; }
-        private Faction _faction;
 
-        public Targeting(Navigation navigation, Faction faction)
+        private UnitTargeting _unitTargeting;
+
+        public Targeting(UnitTargeting unitTargeting)
         {
-            _faction = faction;
+            _unitTargeting = unitTargeting;
+            _unitTargeting.OnTargetChange += OnUnitTargetChange;
+        }
+
+        public bool IsUnitTarget()
+        {
+            return _unitTargeting.CurrentTarget != null
+                && _unitTargeting.CurrentTarget == CurrentTarget;
+        }
+
+        private void OnUnitTargetChange(Unit target)
+        {
+            SetTarget(target);
         }
 
         public void SetTarget(Unit target)
         {
             if (CurrentTarget != null)
-                CurrentTarget.OnDeath -= OnDeath;
+                CurrentTarget.OnDeath -= OnTargetDeath;
             CurrentTarget = target;
             if (CurrentTarget != null)
-                CurrentTarget.OnDeath += OnDeath;
+                CurrentTarget.OnDeath += OnTargetDeath;
             CallTargetChange();
-        }
-
-        public bool IsTargetValid(Unit target)
-        {
-            return target.Player.Faction != _faction;
         }
 
         private void CallTargetChange()
@@ -38,17 +46,17 @@ namespace Assets.Scripts.Weapons
                 OnTargetChange(CurrentTarget);
         }
 
-        private void OnDeath(Unit unit)
+        private void OnTargetDeath(Unit unit)
         {
             SetTarget(null);
         }
 
-        public void Stop()
+        public void Deinit()
         {
             if (CurrentTarget != null)
-                CurrentTarget.OnDeath -= OnDeath;
+                CurrentTarget.OnDeath -= OnTargetDeath;
             CurrentTarget = null;
-            CallTargetChange();
+            _unitTargeting.OnTargetChange -= OnUnitTargetChange;
         }
     }
 }

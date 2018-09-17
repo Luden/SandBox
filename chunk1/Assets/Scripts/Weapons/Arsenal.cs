@@ -12,14 +12,14 @@ namespace Assets.Scripts.Weapons
         private ShotsManager _shotsManager;
         private Navigation _navigation;
         private RegularUpdate _update;
-        private Targeting _targeting;
+        private UnitTargeting _targeting;
         private Following _following;
         private Partset _partset;
         private int _ownerId;
 
         public List<Gun> Guns = new List<Gun>();
 
-        public Arsenal(int ownerId, Navigation navigation, Targeting targeting, Following following, Partset partset, ShotsManager shotsManager, TimeManager timeManager)
+        public Arsenal(int ownerId, Navigation navigation, UnitTargeting targeting, Following following, Partset partset, ShotsManager shotsManager, TimeManager timeManager)
         {
             _ownerId = ownerId;
             _shotsManager = shotsManager;

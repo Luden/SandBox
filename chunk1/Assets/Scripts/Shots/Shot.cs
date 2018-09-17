@@ -11,7 +11,7 @@ namespace Assets.Scripts.Shots
         public Vector3 Direction;
         public int OwnerId;
 
-        public float Damage = 10;
+        public float Damage = 1;
         public float Velocity = 10;
 
         private float _time;

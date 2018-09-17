@@ -9,7 +9,7 @@ namespace Assets.Scripts.Weapons
     {
         public Action OnReloadingFinish;
 
-        public float ReloadTime = 5f;
+        public float ReloadTime = 0.1f;
         public float ReloadTimeDispersion = 0.1f;
 
         public bool IsReloading { get { return ReloadRemainingTime > 0f; } }

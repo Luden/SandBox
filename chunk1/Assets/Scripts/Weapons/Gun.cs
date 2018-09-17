@@ -16,27 +16,34 @@ namespace Assets.Scripts.Weapons
 
         private TimeManager _timeManager;
         private Navigation _navigation;
-        private Targeting _targeting;
+        
         private ShotsManager _shotsManager;
         private Vector3 _targetPosition;
         private int _ownerId;
         private Vector3 _slotOffset;
 
+        public TargetFinder TargetFinder { get; private set; }
+        public Targeting Targeting { get; private set; }
         public Reloader Reloader { get; private set; }
         public Shooter Shooter { get; private set; }
         public Aimer Aimer { get; private set; }
 
-        public void Init(int ownerId, Vector3 slotOffset, Targeting targeting, Navigation navigation, ShotsManager shotsManager, TimeManager timeManager)
+        public Vector3 Position { get { return _navigation.Position + _slotOffset; } }
+
+        public void Init(int ownerId, Vector3 slotOffset, UnitTargeting unitTargeting, Navigation navigation, ShotsManager shotsManager, TimeManager timeManager)
         {
             _slotOffset = slotOffset;
             _ownerId = ownerId;
             _navigation = navigation;
-            _targeting = targeting;
+            
             _timeManager = timeManager;
             _shotsManager = shotsManager;
+
+            Targeting = new Targeting(unitTargeting);
             Reloader = new Reloader(timeManager);
             Shooter = new Shooter(timeManager);
-            Aimer = new Aimer(_navigation, _targeting, _timeManager);
+            Aimer = new Aimer(_navigation, Targeting, _timeManager);
+            TargetFinder = new TargetFinder(Targeting, Aimer, _navigation, Range, _ownerId);
 
             Reloader.OnReloadingFinish += OnReloadingFinish;
             Shooter.OnShootingFinished += OnShootingFinished;
@@ -49,6 +56,8 @@ namespace Assets.Scripts.Weapons
             Reloader.Deinit();
             Shooter.Deinit();
             Aimer.Deinit();
+            Targeting.Deinit();
+            TargetFinder.Deinit();
 
             Reloader.OnReloadingFinish -= OnReloadingFinish;
             Shooter.OnShootingFinished -= OnShootingFinished;
@@ -100,14 +109,14 @@ namespace Assets.Scripts.Weapons
         {
             if (!Shooter.IsShooting)
             {
-                _targetPosition = _targeting.CurrentTarget.Navigation.Position;
+                _targetPosition = Targeting.CurrentTarget.Navigation.Position;
                 Shooter.StartShooting();
             }
         }
 
         public bool CanShootNow()
         {
-            if (!CheckTarget(_targeting.CurrentTarget))
+            if (!CheckTarget(Targeting.CurrentTarget))
                 return false;
 
             return !Shooter.IsShooting && !Reloader.IsReloading && Aimer.IsAimed;
@@ -115,7 +124,7 @@ namespace Assets.Scripts.Weapons
 
         private bool IsTargetValid()
         {
-            return CheckTarget(_targeting.CurrentTarget);
+            return CheckTarget(Targeting.CurrentTarget);
         }
 
         public bool CheckTarget(Unit target)
