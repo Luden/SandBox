@@ -61,6 +61,12 @@ namespace Assets.Scripts.Weapons
             Guns.Remove(gun);
         }
 
+        public void Deinit()
+        {
+            foreach (var gun in Guns)
+                gun.Deinit();
+        }
+
         private void OnTargetChange(Unit unit)
         {
             if (unit == null)

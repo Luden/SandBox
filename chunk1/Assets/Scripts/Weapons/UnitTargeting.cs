@@ -10,11 +10,11 @@ namespace Assets.Scripts.Weapons
         public Action<Unit> OnTargetChange;
 
         public Unit CurrentTarget { get; private set; }
-        private Faction _faction;
+        public Faction Faction { get; private set; }
 
         public UnitTargeting(Faction faction)
         {
-            _faction = faction;
+            Faction = faction;
         }
 
         public void SetTarget(Unit target)
@@ -29,7 +29,7 @@ namespace Assets.Scripts.Weapons
 
         public bool IsTargetValid(Unit target)
         {
-            return target.Player.Faction != _faction;
+            return target.Player.Faction != Faction;
         }
 
         private void CallTargetChange()

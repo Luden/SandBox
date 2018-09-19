@@ -7,7 +7,6 @@ namespace Assets.Scripts.Weapons
 {
     public class TargetFinder
     {
-        private UnitManager _unitManager;
         private TimeManager _timeManager;
 
         private Targeting _targeting;
@@ -24,7 +23,6 @@ namespace Assets.Scripts.Weapons
             _range = range;
             _aimer = aimer;
             _ownerId = ownerId;
-            _unitManager = ManagerProvider.Instance.UnitManager;
             _timeManager = ManagerProvider.Instance.TimeManager;
 
             _timeManager.StartUpdate(ref _regularUpdate, Update, 0.5f);
@@ -50,7 +48,7 @@ namespace Assets.Scripts.Weapons
             for (int i = 0; i < count; i++)
             {
                 var unitObj = _colliders[i].GetComponent<UnitObject>();
-                if (unitObj.Owner.Id == _ownerId)
+                if (unitObj.Owner.Id == _ownerId || unitObj.Owner.Player.Faction == _targeting.Faction)
                     continue;
 
                 if (unitObj.Owner.Hull.IsDead)

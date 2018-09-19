@@ -52,7 +52,7 @@ namespace Assets.Scripts.Units
             CommandProcessor.Stop();
             Navigation.Stop();
             Following.Stop();
-            Arsenal.Stop();
+            Arsenal.Deinit();
             if (OnDeath != null)
                 OnDeath(this);
         }

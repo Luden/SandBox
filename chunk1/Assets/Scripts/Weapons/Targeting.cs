@@ -12,6 +12,7 @@ namespace Assets.Scripts.Weapons
         public Unit CurrentTarget { get; private set; }
 
         private UnitTargeting _unitTargeting;
+        public Faction Faction { get { return _unitTargeting.Faction; } }
 
         public Targeting(UnitTargeting unitTargeting)
         {
